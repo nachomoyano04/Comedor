@@ -1,5 +1,15 @@
 import pool from "../config/database.js";
 
+//GET
+export const listarUnidadDeMedida = async () => {
+    try{
+        const resultado = await pool.query("SELECT * FROM unidad_de_medida");
+        return resultado[0];
+    }catch(error){
+        throw error;
+    }
+}
+
 //POST
 export const insertUnidadDeMedida = async (nombre, simbolo) => {
     const query = "INSERT INTO unidad_de_medida (nombre, simbolo) VALUES (?, ?)";
