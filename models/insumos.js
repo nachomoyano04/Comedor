@@ -1,6 +1,6 @@
 import pool from "../config/database.js";
 
-//GET (todos)
+//READ
 export const getInsumos = async () => {
     try{
        const insumos = await pool.query("SELECT * FROM insumo");
@@ -10,7 +10,7 @@ export const getInsumos = async () => {
     }
 }
 
-//POST
+//CREATE
 export const insertInsumo = async (c, p, m, udm) => {
     const query = "INSERT INTO insumo (codigo, producto, marca, id_unidad_de_medida, estado) VALUES (?,?,?,?,?)";
     try{
@@ -34,7 +34,7 @@ export const updateInsumo = async (c, p, m, udm, id) => {
     }
 }
 
-//UPDATE-DELETE (baja lógica)
+//DELETE
 export const deleteInsumo = async id => {
     const query = "UPDATE insumo SET estado = 0 WHERE id = ?";
     try{

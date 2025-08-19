@@ -1,9 +1,9 @@
 import { json } from "express";
-import { deleteUnidadDeMedida, insertUnidadDeMedida, listarUnidadDeMedida, updateUnidadDeMedida } from "../models/unidad_de_medida.js";
+import { deleteUnidadDeMedida, insertUnidadDeMedida, getUnidadDeMedida, updateUnidadDeMedida } from "../models/unidad_de_medida.js";
 
 export const listarUDM = async (req, res) => {
     try{
-        const resultado = await listarUnidadDeMedida();
+        const resultado = await getUnidadDeMedida();
         return json(resultado);
     }catch (error) {
         console.log(error);
