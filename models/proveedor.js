@@ -1,33 +1,41 @@
 import pool from "../config/database.js";
 
 //CREATE
-export const createFuncion = () => {
+export const insertProveedor = async (cdgo, rs, nf, cuit, ha, dclio, lc, email) => {
+    const query = "INSERT INTO proveedor (codigo, razon_social, nombre_fantasia, cuit, horarios_atencion, domicilio, localidad, email, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     try{
-        
+        const resultado = await pool.query(query, [cdgo, rs, nf, cuit, ha, dclio, lc, email, 1]);
+        return resultado[0];
     }catch(error){
         throw error;
     }
 }
 //READ
-export const createFuncion = () => {
+export const getProveedores = async () => {
+    const query = "SELECT * FROM proveedor WHERE estado = 1";
     try{
-        
+        const resultado = await pool.query(query);
+        return resultado[0];
     }catch(error){
         throw error;
     }
 }
 //UPDATE
-export const createFuncion = () => {
+export const updateProveedor = async (cdgo, rs, nf, cuit, ha, dclio, lc, email, id) => {
+    const query = "UPDATE proveedor SET codigo = ?, razon_social = ?, nombre_fantasia = ?, cuit = ?, horarios_atencion = ?, domicilio = ?, localidad = ?, email = ? WHERE id = ?";
     try{
-        
+        const resultado = await pool.query(query, [cdgo, rs, nf, cuit, ha, dclio, lc, email, id]);
+        return resultado[0];
     }catch(error){
         throw error;
     }
 }
 //DELETE
-export const createFuncion = () => {
+export const deleteProveedor = async (id) => {
+    const query = "UPDATE proveedor SET estado = 0 WHERE id = ?";
     try{
-        
+        const resultado = await pool.query(query, [id]);
+        return resultado[0];
     }catch(error){
         throw error;
     }
