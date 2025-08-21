@@ -1,11 +1,83 @@
 import pool from "../config/database.js";
 
 //CREATE
-
-export const createUsuario = async (rol_id, nombre, apellido, dni, cuil, telefono, password, estado) => {
-
+export const insertUsuario = async (rol_id, nombre, apellido, dni, cuil, telefono, password) => {
+    const query = "INSERT INTO usuario (rol_id, nombre, apellido, dni, cuil, telefono, password, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    try{
+        const resultado = await pool.query(query, [rol_id, nombre, apellido, dni, cuil, telefono, password, 1]);
+        return resultado[0];
+    }catch(error){
+        throw(error);
+    }
 }
 
 //READ
+export const getUsuarios = async () => {
+    const query = "SELECT * FROM usuario WHERE estado = 1";
+    try{
+        const resultado = await pool.query(query);
+        return resultado[0];
+    }catch(error){
+        throw(error);
+    }
+}
+export const getUsuariosByRol = async (rol_id) => {
+    const query = "SELECT * FROM usuario WHERE rol_id = ?";
+    try{
+        const resultado = await pool.query(query, [rol_id]);
+        return resultado[0];
+    }catch(error){
+        throw(error);
+    }
+}
+
+export const findUsuarioByDNI = async (dni) => {
+    const query = "SELECT * FROM usuario WHERE dni = ?";
+    try{
+        const resultado = await pool.query(query, [dni]);
+        return resultado[0];
+    }catch(error){
+        throw(error);
+    }
+}
+
 //UPDATE
+export const updateUsuario = async (nombre, apellido, dni, cuil, telefono, id) => {
+    const query = "UPDATE usuario SET nombre = ?, apellido = ?, dni = ?, cuil = ?, telefono = ? WHERE id = ?";
+    try{
+        const resultado = await pool.query(query, [nombre, apellido, dni, cuil, telefono, id]);
+        return resultado[0];
+    }catch(error){
+        throw(error);
+    }
+}
+
+export const updateRol = async (rol_id, id) => {
+    const query = "UPDATE usuario SET rol_id = ? WHERE id = ?";
+    try{
+        const resultado = await pool.query(query, [rol_id, id]);
+        return resultado[0];
+    }catch(error){
+        throw(error);
+    }
+} 
+
+export const updatePassword = async (password, id) => {
+    const query = "UPDATE usuario SET password = ? WHERE id = ?";
+    try{
+        const resultado = await pool.query(query, [password, id]);
+        return resultado[0];
+    }catch(error){
+        throw(error);
+    }
+}
 //DELETE
+export const deleteUsuario = async (id) => {
+    const query = "UPDATE usuario SET estado = 0 WHERE id = ?";
+    try{
+        const resultado = await pool.query(query, [id]);
+        return resultado[0];
+    }catch(error){
+        throw(error);       
+    }
+}

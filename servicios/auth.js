@@ -1,5 +1,10 @@
 import argon2 from "argon2";
+import { findUsuarioByDNI, insertUsuario } from "../models/usuario.js";
 
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "comedor_secret_access_123";
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "comedor_secret_refresh_123";
+
+//Hasheo de password
 export const hashearPassword = async pass => {
     try{
         const hash = await argon2.hash(pass, {
@@ -14,7 +19,8 @@ export const hashearPassword = async pass => {
     }
 }
 
-export const verificarPassword = async (pass, hash) => {
+//Verificar password
+export const verificarPassword = async (hash, pass) => {
     try{
         return await argon2.verify(hash, pass);
     }catch(error){
@@ -23,7 +29,37 @@ export const verificarPassword = async (pass, hash) => {
     }
 };
 
-export const login = (req, res) => {
-    const {dni, password} = req.body;
-    
+//Generar token
+export const generateAccessToken = usuario => {
+    return jwt.sign({id: usuario.id, dni: usuario.dni}, ACCESS_TOKEN_SECRET, {expiresIn: '15m'});
+};
+
+//Renovamos token
+export const refreshAccessToken = usuario => {
+    return jwt.sign({id: usuario.id, dni: usuario.dni}, REFRESH_TOKEN_SECRET, {expiresIn: '7d'});
+};
+
+//Creamos el usuario
+export const registerUser = async (rol_id, nombre, apellido, dni, cuil, telefono, password) => {
+    try{
+        const passHasheada = await hashearPassword(password);
+        const resultado = await insertUsuario(rol_id, nombre, apellido, dni, cuil, telefono, passHasheada);
+        return resultado;
+    }catch(error){
+        throw error;
+    }
+}
+
+export const login = async (dni, password) => {
+    const usuario = await findUsuarioByDNI(dni);
+    if(!usuario){
+        throw json({error: "Usuario no encontrado"});
+    }
+    const passValida = await verificarPassword(usuario[0].password, password);
+    if(!passValida){
+        throw json({error: "Password incorrecta"});
+    }
+    const access_token = generateAccessToken(usuario);
+    const refresh_token = refreshAccessToken(usuario);
+    return {access_token, refresh_token};    
 }
