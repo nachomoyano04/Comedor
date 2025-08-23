@@ -12,9 +12,9 @@ export const listarInsumos = async (req, res) => {
 }
 
 export const nuevoInsumo = async (req, res) => {
+    const insumo = req.body;
     try{
-        const {codigo, producto, marca, unidad_de_medida} = req.body;
-        const resultado = await insertInsumo(codigo, producto, marca, unidad_de_medida);
+        const resultado = await insertInsumo(insumo);
         res.json(resultado);
     }catch(error){
         console.log(error);
@@ -23,8 +23,9 @@ export const nuevoInsumo = async (req, res) => {
 }
 
 export const editarInsumo = async (req, res) => {
+    const {cod, prod, marca, udm} = req.body
+    const {id} = req.params;
     try{
-        const {cod, prod, marca, udm, id} = req.body
         const resultado = await updateInsumo(cod, prod, marca, udm, id);
         res.json(resultado);
     }catch(error){

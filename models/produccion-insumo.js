@@ -30,3 +30,12 @@ export const updateProduccion_Insumo = async(prod_id, ins_id, cant_usada, precio
     }
 }
 //DELETE
+export const deleteProduccion_Insumo = async(id) => {
+    const query = "DELETE FROM produccion-insumo WHERE id = ?";
+    try{
+        const resultado = await pool.query(query, [id]);
+        return resultado[0];
+    }catch(error){
+        throw error;
+    }
+}

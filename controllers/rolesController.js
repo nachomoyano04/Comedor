@@ -12,18 +12,19 @@ export const listarRoles = async (req, res) => {
 }
 
 export const crearRol = async (req, res) => {
-    const [numero_rol, nombre_rol] = req.body;
+    const rol = req.body;
     try{
-        const resultado = await insertRol(numero_rol, nombre_rol);
+        const resultado = await insertRol(rol);
         return json(resultado);
     }catch(error){
         console.log(error); 
-        res.status(500).json({error: "Error al listar los roles"}); 
+        res.status(500).json({error: "Error al crear los roles"}); 
     }
 }
 
 export const editarRol = async (req, res) => {
-    const [numero_rol, nombre_rol, id] = req.body;
+    const {id} = req.params;
+    const {numero_rol, nombre_rol} = req.body;
     try{
         const resultado = await updateRol(numero_rol, nombre_rol, id);
         return json(resultado);
@@ -34,7 +35,7 @@ export const editarRol = async (req, res) => {
 }
 
 export const eliminarRol = async (req, res) => {
-    const [id] = req.body;
+    const {id} = req.params;
     try{
         const usuario = await getUserByRolId(id);
         if(usuario){

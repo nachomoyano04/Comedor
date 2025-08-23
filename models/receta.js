@@ -1,7 +1,7 @@
 import pool from "../config/database.js";
 
 //CREATE
-export const insertReceta = async (fecha, precio_unitario, importe, estado) => {
+export const insertReceta = async (fecha, precio_unitario, importe) => {
     const query = "INSERT INTO receta (fecha, precio_unitario, importe, estado) VALUES (?, ?, ?, ?)";
     try{
         const resultado = await pool.query(query, [fecha, precio_unitario, importe, 1]);
@@ -23,10 +23,10 @@ export const getRecetasActivas = async id => {
 }
 
 //UPDATE
-export const updateReceta = async (fecha, precio_unitario, importe, estado, id) => {
-    const query = "UPDATE receta SET (fecha = ?, precio_unitario = ?, importe = ?, estado = ?) WHERE id = ?";
+export const updateReceta = async (fecha, precio_unitario, importe, id) => {
+    const query = "UPDATE receta SET (fecha = ?, precio_unitario = ?, importe = ?) WHERE id = ?";
     try{
-        const resultado = await pool.query(query, [fecha, precio_unitario, importe, estado, id]);
+        const resultado = await pool.query(query, [fecha, precio_unitario, importe, id]);
         return resultado[0];
     }catch(error){
         throw error;
