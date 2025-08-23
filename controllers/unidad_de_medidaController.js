@@ -12,9 +12,9 @@ export const listarUDM = async (req, res) => {
 }
 
 export const nuevoUDM = async (req, res) => {
-    const {nombre, simbolo} = req.body;
+    const unidad_de_medida = req.body;
     try{
-        const resultado = await insertUnidadDeMedida(nombre, simbolo);
+        const resultado = await insertUnidadDeMedida(unidad_de_medida);
         return json(resultado);
     }catch(error){
        console.log(error);
@@ -22,7 +22,8 @@ export const nuevoUDM = async (req, res) => {
     }
 }
 export const editarUDM = async (req, res) => {
-    const {nombre, simbolo, id} = req.body;
+    const {id} = req.params;
+    const {nombre, simbolo} = req.body;
     try{
         const resultado = await updateUnidadDeMedida(nombre, simbolo, id);
         return json(resultado);
@@ -32,7 +33,7 @@ export const editarUDM = async (req, res) => {
     }
 }
 export const borrarUDM = async (req, res) => {
-    const {id} = req.body;
+    const {id} = req.params;
     try{
         const resultado = await deleteUnidadDeMedida(id);
         return json(resultado);        

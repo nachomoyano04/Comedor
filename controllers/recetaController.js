@@ -1,0 +1,47 @@
+import { json } from "express";
+import { deleteReceta, getRecetasActivas, insertReceta, updateReceta } from "../models/receta";
+
+export const nuevaReceta = async (req, res) => {
+    const receta = req.body;
+    try{
+        const resultado = await insertReceta(receta);
+        return json(resultado);
+    }catch(error) {
+        console.log(error);
+        res.status(500).json({error: "Error al registrar nueva receta"});
+    }
+}
+
+export const obtenerRecetas = async (req, res) => {
+    try{
+        const resultado = await getRecetasActivas();
+        return json(resultado);
+    }catch(error) {
+        console.log(error);
+        res.status(500).json({error: "Error al obtener recetas"});
+    }
+}
+
+export const actualizarReceta = async (req, res) => {
+    const {id} = req.params;
+    const {fecha, precio_unitario, importe} = req.body;
+    try{
+        const resultado = await updateReceta(fecha, precio_unitario, importe, id);
+        return json(resultado);
+    }catch(error) {
+        console.log(error);
+        res.status(500).json({error: "Error al actualizar receta"});
+    }
+}
+
+export const borrarReceta = async (req, res) => {
+    const {id} = req.params;
+    try{
+        const resultado = await deleteReceta(id);
+        return json(resultado);
+    }catch(error) {
+        console.log(error);
+        res.status(500).json({error: "Error al borrar nueva receta"});
+    }
+}
+
