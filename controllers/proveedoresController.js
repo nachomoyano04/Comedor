@@ -1,5 +1,6 @@
 import { json } from "express";
 import { deleteProveedor, getProveedores, insertProveedor, updateProveedor } from "../models/proveedor";
+import { deleteContactoProveedor, getConProvByIdProveedor, insertContactoProveedor, updateContactoProveedor } from "../models/contacto_proveedor";
 
 export const nuevoProveedor = async (req, res) => {
     const proveedor = req.body;
@@ -45,3 +46,47 @@ export const borrarProveedor = async (req, res) => {
     }
 } 
 
+export const nuevoContactoProveedor = async (req, res) => {
+    const contacto_proveedor = req.body;
+    try{
+        const resultado = await insertContactoProveedor(contacto_proveedor);
+        return json(resultado);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({error: "Error al agregar nuevo contacto de proveedor"});       
+    }
+}
+
+export const editarContactoProveedor = async (req, res) => {
+    const {proveedor_id, nombre, telefono, email, es_principal} = req.body;
+    const {id} = req.params;
+    try{
+        const resultado = await updateContactoProveedor(proveedor_id, nombre, telefono, email, es_principal, id);
+        return json(resultado);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({error: "Error al editar contacto de proveedor"});       
+    }
+}
+
+export const obtenerContactosPorProveedor = async (req, res) => {
+    const {id} = req.params;
+    try{
+        const resultado = await getConProvByIdProveedor(id);
+        return json(resultado);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({error: "Error al obtener contactos del proveedor"});       
+    }
+}
+
+export const borrarContactoProveedor = async (req, res) => {
+    const {id} = req.params;
+    try{
+        const resultado = await deleteContactoProveedor(id);
+        return json(resultado);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({error: "Error al borrar contacto del proveedor"});       
+    }
+}

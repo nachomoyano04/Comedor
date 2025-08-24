@@ -1,5 +1,6 @@
 import { json } from "express";
 import { deleteReceta, getRecetasActivas, insertReceta, updateReceta } from "../models/receta";
+import { insertReceta_Insumo } from "../models/receta-insumo";
 
 export const nuevaReceta = async (req, res) => {
     const receta = req.body;
@@ -45,3 +46,34 @@ export const borrarReceta = async (req, res) => {
     }
 }
 
+export const agregarInsumoAReceta = async (req, res) => {
+    const receta_insumo = req.body;
+    try{
+        const resultado = await insertReceta_Insumo(receta_insumo);
+        return json(resultado);
+    }catch(error) {
+        console.log(error);
+        res.status(500).json({error: "Error al borrar nueva receta"});
+    }
+}
+
+export const modificarInsumoDeReceta = async (req, res) => {
+    const receta_insumo = req.body;
+    try{
+        const resultado = await insertReceta_Insumo(receta_insumo);
+        return json(resultado);
+    }catch(error) {
+        console.log(error);
+        res.status(500).json({error: "Error al borrar nueva receta"});
+    }
+}
+export const borrarInsumoDeReceta = async (req, res) => {
+    const receta_insumo = req.body;
+    try{
+        const resultado = await insertReceta_Insumo(receta_insumo);
+        return json(resultado);
+    }catch(error) {
+        console.log(error);
+        res.status(500).json({error: "Error al borrar nueva receta"});
+    }
+}
