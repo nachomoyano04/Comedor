@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/", listarInsumos);
 router.post("/", nuevoInsumo);
-router.put("/", editarInsumo);
+router.put("/:id", editarInsumo);
 router.patch("/", borrarInsumo);
 
 export default router;

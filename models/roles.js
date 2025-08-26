@@ -10,6 +10,17 @@ export const insertRol = async (numero_rol, nombre_rol) => {
         throw error;
     }
 }
+
+export const insertUsuario_Rol = async (usuario_id, rol_id) => {
+    const query = "INSERT INTO usuario-rol (usuario_id, rol_id) VALUES (?, ?)";
+    try{
+        const resultado = await pool.query(query, [usuario_id, rol_id]);
+        return resultado[0];
+    }catch(error){
+        throw error;
+    }
+}
+
 //READ
 export const getRoles = async () => {
     const query = "SELECT * FROM rol";
@@ -22,10 +33,20 @@ export const getRoles = async () => {
 }
 
 export const getUserByRolId = async rol_id => {
-    const query = "SELECT * usuario WHERE rol_id = ?";
+    const query = "SELECT * FROM usuario-rol JOIN usuario WHERE rol_id = ?";
     try{
         const resultado = await pool.query(query, [rol_id]);
         return resultado[0]; 
+    }catch(error){
+        throw error;
+    }
+}
+
+export const getRolesByUser = async usuario_id => {
+    const query = "SELECT * FROM usuario-rol JOIN rol WHERE usuario_id = ?";
+    try{
+        const resultado = await pool.query(query, [usuario_id]);
+        return resultado[0];
     }catch(error){
         throw error;
     }

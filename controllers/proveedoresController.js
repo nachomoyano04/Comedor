@@ -1,6 +1,6 @@
 import { json } from "express";
-import { deleteProveedor, getProveedores, insertProveedor, updateProveedor } from "../models/proveedor";
-import { deleteContactoProveedor, getConProvByIdProveedor, insertContactoProveedor, updateContactoProveedor } from "../models/contacto_proveedor";
+import { deleteProveedor, getProveedores, insertProveedor, updateProveedor } from "../models/proveedor.js";
+import { deleteContactoProveedor, getConProvByIdProveedor, insertContactoProveedor, updateContactoProveedor } from "../models/contacto_proveedor.js";
 
 export const nuevoProveedor = async (req, res) => {
     const proveedor = req.body;
@@ -13,7 +13,7 @@ export const nuevoProveedor = async (req, res) => {
     }
 } 
 
-export const actualizarProveedor = async (req, res) => {
+export const editarProveedor = async (req, res) => {
     const {id} = req.params;
     const {codigo, razon_social, nombre_fantasia, cuit, horarios_atencion, domicilio, localidad, email} = req.body;
     try{

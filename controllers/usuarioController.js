@@ -1,6 +1,7 @@
 import { json } from "express";
-import { deleteUsuario, findUsuarioByDNI, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario";
-import { hashearPassword } from "../servicios/auth";
+import { deleteUsuario, findUsuarioByDNI, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario.js";
+import { hashearPassword } from "../servicios/auth.js";
+import { insertUsuario_Rol } from "../models/roles.js";
 
 export const nuevoUsuario = async (req, res) => {
     const usuario = req.body;
@@ -13,7 +14,7 @@ export const nuevoUsuario = async (req, res) => {
     }
 }
 
-export const actualizarUsuario = async (req, res) => {
+export const editarUsuario = async (req, res) => {
     const {id} = req.params
     const {nombre, apellido, dni, cuil, telefono} = req.body;
     try{
@@ -32,6 +33,28 @@ export const obtenerUsuarios = async (req, res) => {
     }catch(error){
         console.log(error);
         res.status(500).json({error: "Error al obtener usuarios"});
+    }
+}
+
+export const borrarUsuario = async (req, res) => {
+    const {id} = req.params;
+    try{
+        const resultado = await deleteUsuario(id);
+        return json(resultado);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({error: "Error al borrar usuario"});
+    }
+}
+
+export const nuevoRolAUsuario = async (req, res) => {
+    const {usuario_id, rol_id} = req.body;
+    try{
+        const resultado = await insertUsuario_Rol(usuario_id, rol_id);
+        return json(resultado);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({error: "Error al asignar rol al usuario"});
     }
 }
 
@@ -78,16 +101,5 @@ export const cambiarPassword = async (req, res) => {
     }catch(error){
         console.log(error);
         res.status(500).json({error: "Error al actualizar password"});
-    }
-}
-
-export const borrarUsuario = async (req, res) => {
-    const {id} = req.params;
-    try{
-        const resultado = await deleteUsuario(id);
-        return json(resultado);
-    }catch(error){
-        console.log(error);
-        res.status(500).json({error: "Error al borrar usuario"});
     }
 }

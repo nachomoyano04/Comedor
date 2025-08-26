@@ -11,11 +11,12 @@ export const getInsumos = async () => {
 }
 
 //CREATE
-export const insertInsumo = async (c, p, m, udm) => {
-    const query = "INSERT INTO insumo (codigo, producto, marca, id_unidad_de_medida, estado) VALUES (?,?,?,?,?)";
+export const insertInsumo = async insumo => {
+    insumo.estado = 1;
+    const query = "INSERT INTO insumo SET ?";
     try{
-        const resultado = await pool.query(query, [c, p, m, udm, 1]);
-        return resultado;
+        const resultado = await pool.query(query, insumo);
+        return resultado[0];
     }catch(error){
         console.log(`Error: ${error.message}`);
         throw error;

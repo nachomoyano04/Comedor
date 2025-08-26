@@ -1,5 +1,5 @@
 import { json } from "express";
-import { getPrecioByInsumo, insertPrecio, updatePrecio } from "../models/precio";
+import { getPrecioByInsumo, insertPrecio, updatePrecio } from "../models/precio.js";
 
 export const crearPrecio = async (req, res) => {
     const precio = req.body;

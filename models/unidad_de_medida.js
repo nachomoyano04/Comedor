@@ -11,11 +11,11 @@ export const getUnidadDeMedida = async () => {
 }
 
 //CREATE
-export const insertUnidadDeMedida = async (nombre, simbolo) => {
-    const query = "INSERT INTO unidad_de_medida (nombre, simbolo) VALUES (?, ?)";
+export const insertUnidadDeMedida = async (unidad_de_medida) => {
+    const query = "INSERT INTO unidad_de_medida SET ?";
     try{
-        const resultado = await pool.query(query, [nombre, simbolo]);
-        return resultado;
+        const resultado = await pool.query(query, unidad_de_medida);
+        return resultado[0];
     }catch(error){
         throw error; 
     }
@@ -26,7 +26,7 @@ export const deleteUnidadDeMedida = async id => {
     const query = "DELETE FROM unidad_de_medida WHERE id = ?";
     try{
         const resultado = await pool.query(query, [id]);
-        return resultado;
+        return resultado[0];
     }catch(error){
         throw error;
     }
@@ -37,7 +37,7 @@ export const updateUnidadDeMedida = async (nombre, simbolo, id) => {
 const query = "UPDATE unidad_de_medida SET nombre = ?, simbolo = ? WHERE id = ?";
     try{
         const resultado = await pool.query(query, [nombre, simbolo, id]);
-        return resultado;
+        return resultado[0];
     }catch(error){
         throw error;
     }

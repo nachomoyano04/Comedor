@@ -31,3 +31,12 @@ export const updateReceta_Insumo = async(receta_id, insumo_id, cantidad, id) => 
     }
 }
 //DELETE
+export const deleteReceta_Insumo = async (id) => {
+    const query = "DELETE FROM receta-insumo WHERE id = ?";
+    try{
+        const resultado = await pool.query(query, [id]);
+        return resultado[0];
+    }catch(error){
+        throw error;
+    }
+}

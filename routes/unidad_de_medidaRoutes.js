@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.get("/", listarUDM);
 router.post("/", nuevoUDM);
-router.put("/", editarUDM);
-router.delete("/", borrarUDM);
+router.put("/:id", editarUDM);
+router.delete("/:id", borrarUDM);
 
 export default router;
