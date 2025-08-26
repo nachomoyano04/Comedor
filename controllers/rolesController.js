@@ -1,5 +1,5 @@
 import { json } from "express";
-import { deleteRol, getRoles, getUserByRolId, insertRol, updateRol } from "../models/roles";
+import { deleteRol, getRoles, getRolesByUser, getUserByRolId, insertRol, updateRol } from "../models/roles.js";
 
 export const listarRoles = async (req, res) => {
     try{
@@ -11,7 +11,18 @@ export const listarRoles = async (req, res) => {
     }
 }
 
-export const crearRol = async (req, res) => {
+export const listarRolesPorUsuario = async (req, res) => {
+    const {usuario_id} = req.params;
+    try{
+        const resultado = await getRolesByUser(usuario_id);
+        return json(resultado);
+    }catch(error){
+        console.log(error); 
+        res.status(500).json({error: "Error al listar los roles del usuario"}); 
+    }
+}
+
+export const nuevoRol = async (req, res) => {
     const rol = req.body;
     try{
         const resultado = await insertRol(rol);
@@ -30,11 +41,11 @@ export const editarRol = async (req, res) => {
         return json(resultado);
     }catch(error){
         console.log(error); 
-        res.status(500).json({error: "Error al listar los roles"}); 
+        res.status(500).json({error: "Error al editar el rol"}); 
     }
 }
 
-export const eliminarRol = async (req, res) => {
+export const borrarRol = async (req, res) => {
     const {id} = req.params;
     try{
         const usuario = await getUserByRolId(id);
@@ -46,6 +57,6 @@ export const eliminarRol = async (req, res) => {
         }
     }catch(error){
         console.log(error); 
-        res.status(500).json({error: "Error al listar los roles"}); 
+        res.status(500).json({error: "Error al eliminar rol"}); 
     }
 }

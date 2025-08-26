@@ -1,6 +1,6 @@
 import { json } from "express";
-import { deleteReceta, getRecetasActivas, insertReceta, updateReceta } from "../models/receta";
-import { insertReceta_Insumo } from "../models/receta-insumo";
+import { deleteReceta, getRecetasActivas, insertReceta, updateReceta } from "../models/receta.js";
+import { deleteReceta_Insumo, insertReceta_Insumo, updateReceta_Insumo } from "../models/receta-insumo.js";
 
 export const nuevaReceta = async (req, res) => {
     const receta = req.body;
@@ -23,7 +23,7 @@ export const obtenerRecetas = async (req, res) => {
     }
 }
 
-export const actualizarReceta = async (req, res) => {
+export const editarReceta = async (req, res) => {
     const {id} = req.params;
     const {fecha, precio_unitario, importe} = req.body;
     try{
@@ -53,27 +53,28 @@ export const agregarInsumoAReceta = async (req, res) => {
         return json(resultado);
     }catch(error) {
         console.log(error);
-        res.status(500).json({error: "Error al borrar nueva receta"});
+        res.status(500).json({error: "Error al agregar insumo a receta"});
     }
 }
 
 export const modificarInsumoDeReceta = async (req, res) => {
-    const receta_insumo = req.body;
+    const {receta_id, insumo_id, cantidad} = req.body;
+    const {id} = req.params;
     try{
-        const resultado = await insertReceta_Insumo(receta_insumo);
+        const resultado = await updateReceta_Insumo(receta_id, insumo_id, cantidad, id);
         return json(resultado);
     }catch(error) {
-        console.log(error);
-        res.status(500).json({error: "Error al borrar nueva receta"});
+        console.log(error); 
+        res.status(500).json({error: "Error al modificar insumo de receta"});
     }
 }
 export const borrarInsumoDeReceta = async (req, res) => {
-    const receta_insumo = req.body;
+    const {id} = req.params;
     try{
-        const resultado = await insertReceta_Insumo(receta_insumo);
+        const resultado = await deleteReceta_Insumo(id);
         return json(resultado);
     }catch(error) {
         console.log(error);
-        res.status(500).json({error: "Error al borrar nueva receta"});
+        res.status(500).json({error: "Error al borrar insumo de receta"});
     }
 }
