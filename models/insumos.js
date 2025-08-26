@@ -18,7 +18,6 @@ export const insertInsumo = async insumo => {
         const resultado = await pool.query(query, insumo);
         return resultado[0];
     }catch(error){
-        console.log(`Error: ${error.message}`);
         throw error;
     }
 }
@@ -28,9 +27,8 @@ export const updateInsumo = async (c, p, m, udm, id) => {
     const query = "UPDATE insumo SET codigo = ?, producto = ?, marca = ?, id_unidad_de_medida = ? WHERE id = ?";
     try{
         const resultado = await pool.query(query, [c, p, m, udm, id]);
-        return resultado;
+        return resultado[0];
     }catch(error){
-        console.log(`Error: ${error.message}`);
         throw error;
     }
 }
@@ -40,9 +38,17 @@ export const deleteInsumo = async id => {
     const query = "UPDATE insumo SET estado = 0 WHERE id = ?";
     try{
         const resultado = await pool.query(query, [id]);
-        return resultado;
+        return resultado[0];
     }catch(error){
-        console.log(`Error: ${error.message}`);
+        throw error;
+    }
+}
+export const activateInsumo = async id => {
+    const query = "UPDATE insumo SET estado = 1 WHERE id = ?";
+    try{
+        const resultado = await pool.query(query, [id]);
+        return resultado[0];
+    }catch(error){
         throw error;
     }
 }

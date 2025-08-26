@@ -1,5 +1,4 @@
-import { json } from "express";
-import {deleteInsumo, getInsumos, insertInsumo, updateInsumo} from "../models/insumos.js";
+import {activateInsumo, deleteInsumo, getInsumos, insertInsumo, updateInsumo} from "../models/insumos.js";
 
 export const listarInsumos = async (req, res) => {
     try{
@@ -36,12 +35,23 @@ export const editarInsumo = async (req, res) => {
 }
 
 export const borrarInsumo = async (req, res) => {
+    const {id} = req.params;
     try {
-        const {id} = req.body;
         const resultado = await deleteInsumo(id);
-        return json(resultado);
+        res.json(resultado);
     } catch (error) {
         console.log(error);
         res.status(500).json({error: "Error al eliminar insumo", mensaje: error.sqlMessage});
+    }
+}
+
+export const activarInsumo = async (req, res) => {
+    const {id} = req.params;
+    try {
+        const resultado = await activateInsumo(id);
+        res.json(resultado);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error: "Error al activar insumo", mensaje: error.sqlMessage});
     }
 }
