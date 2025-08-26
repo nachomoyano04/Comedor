@@ -22,7 +22,7 @@ app.use(express.json());
 app.use("/insumos", insumosRouter);
 app.use("/precio", precioRouter);
 app.use("/produccion", produccionRouter);
-app.use("/proveedores", proveedoresRouter);
+app.use("/proveedor", proveedoresRouter);
 app.use("/receta", recetaRouter);
 app.use("/roles", rolesRouter);
 app.use("/udm", unidad_de_medidaRouter);
