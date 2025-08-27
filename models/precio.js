@@ -1,10 +1,13 @@
 import pool from "../config/database.js";
+import dayjs from "dayjs";
 
 //CREATE
-export const insertPrecio = async (ins_id, prov_id, precio_unit, f_desde, f_hasta) => {
-    const query = "INSERT INTO precio (insumo_id, proveedor_id, precio_unitario, fecha_desde, fecha_hasta) VALUES (?, ?, ?, ?, ?)";
+export const insertPrecio = async precio => {
+    const fecha_actual = dayjs().format("YYYY-MM-DD HH:mm:ss");
+    precio.fecha_desde = fecha_actual; 
+    const query = "INSERT INTO precio SET ?";
     try{
-        const resultado = await pool.query(query, [ins_id, prov_id, precio_unit, f_desde, f_hasta]);
+        const resultado = await pool.query(query, precio);
         return resultado[0];
     }catch(error){
         throw error;
@@ -24,7 +27,7 @@ export const getPrecioByInsumo = async id => {
 
 //UPDATE
 export const updatePrecio = async (ins_id, prov_id, precio_unit, f_desde, f_hasta, id) => {
-    const query = "UPDATE precio SET (insumo_id = ?, proveedor_id = ?, precio_unitario = ?, fecha_desde = ?, fecha_hasta = ?) WHERE id = ?";
+    const query = "UPDATE precio SET insumo_id = ?, proveedor_id = ?, precio_unitario = ?, fecha_desde = ?, fecha_hasta = ? WHERE id = ?";
     try{
         const resultado = await pool.query(query, [ins_id, prov_id, precio_unit, f_desde, f_hasta, id]);
         return resultado[0];
@@ -32,4 +35,14 @@ export const updatePrecio = async (ins_id, prov_id, precio_unit, f_desde, f_hast
         throw error;
     }
 }
+
 //DELETE
+export const deletePrecio = async id => {
+    const query = "DELETE FROM precio WHERE id = ?";
+    try{
+        const resultado = await pool.query(query, [id]);
+        return resultado[0];       
+    }catch(error){
+        throw error;
+    }
+}
