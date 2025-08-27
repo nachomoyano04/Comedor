@@ -1,10 +1,13 @@
 import pool from "../config/database.js";
+import dayjs from "dayjs";
 
 //CREATE
-export const insertReceta = async (fecha, precio_unitario, importe) => {
-    const query = "INSERT INTO receta (fecha, precio_unitario, importe, estado) VALUES (?, ?, ?, ?)";
+export const insertReceta = async receta => {
+    receta.fecha = dayjs().format("YYYY-MM-DD HH:mm:ss");
+    receta.estado = 1;
+    const query = "INSERT INTO receta SET ?";
     try{
-        const resultado = await pool.query(query, [fecha, precio_unitario, importe, 1]);
+        const resultado = await pool.query(query, receta);
         return resultado[0];
     }catch(error){
         throw error;
@@ -23,10 +26,10 @@ export const getRecetasActivas = async id => {
 }
 
 //UPDATE
-export const updateReceta = async (fecha, precio_unitario, importe, id) => {
-    const query = "UPDATE receta SET (fecha = ?, precio_unitario = ?, importe = ?) WHERE id = ?";
+export const updateReceta = async (precio_unitario, importe, id) => {
+    const query = "UPDATE receta SET precio_unitario = ?, importe = ? WHERE id = ?";
     try{
-        const resultado = await pool.query(query, [fecha, precio_unitario, importe, id]);
+        const resultado = await pool.query(query, [precio_unitario, importe, id]);
         return resultado[0];
     }catch(error){
         throw error;
@@ -34,8 +37,18 @@ export const updateReceta = async (fecha, precio_unitario, importe, id) => {
 }
 
 //DELETE
-export const deleteReceta = async (id) => {
-    const query = "UPDATE receta SET (estado = 0) WHERE id = ?";
+export const deleteReceta = async id => {
+    const query = "UPDATE receta SET estado = 0 WHERE id = ?";
+    try{
+        const resultado = await pool.query(query, [id]);
+        return resultado[0];
+    }catch(error){
+        throw error;
+    }
+}
+
+export const activateReceta = async id => {
+    const query = "UPDATE receta SET estado = 1 WHERE id = ?";
     try{
         const resultado = await pool.query(query, [id]);
         return resultado[0];
