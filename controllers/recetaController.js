@@ -27,9 +27,9 @@ export const obtenerRecetas = async (req, res) => {
 
 export const editarReceta = async (req, res) => {
     const {id} = req.params;
-    const {precio_unitario, importe} = req.body;
+    const {nombre, descripcion, precio_unitario, importe} = req.body;
     try{
-        const resultado = await updateReceta(precio_unitario, importe, id);
+        const resultado = await updateReceta(nombre, descripcion, precio_unitario, importe, id);
         if(resultado.affectedRows == 1){
             return res.json("Receta editada.")
         }

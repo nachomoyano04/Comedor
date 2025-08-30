@@ -1,10 +1,13 @@
+import dayjs from "dayjs";
 import pool from "../config/database.js";
 
 //CREATE
-export const insertProduccion = async (r_id, fecha, cant_prod, cpt, cpu, cpum, turno) => {
-    const query = "INSERT INTO produccion (receta_id, fecha, cantidad_producida, costo_primo_total, costo_primo_unitario, cantidad_por_unidad_medida, turno) VALUES (?, ?, ?, ?, ?, ?, ?)";
+export const insertProduccion = async produccion => {
+    produccion.fecha = dayjs().format("YYYY-MM-DD HH:mm:ss");
+    produccion.estado = 1;
+    const query = "INSERT INTO produccion SET ?";
     try{
-        const resultado = await pool.query(query, [r_id, fecha, cant_prod, cpt, cpu, cpum, turno]);
+        const resultado = await pool.query(query, produccion);
         return resultado[0];
     }catch(error){
         throw error;
@@ -21,13 +24,22 @@ export const getProducciones = async () => {
     }
 }
 //UPDATE
-export const updateProduccion = async (r_id, fecha, cant_prod, cpt, cpu, cpum, turno, id) => {
-    const query = "UPDATE produccion SET receta_id = ?, fecha = ?, cantidad_producida = ?, costo_primo_total = ?, costo_primo_unitario = ?, cantidad_por_unidad_medida = ?, turno = ? WHERE id = ?";
+export const updateProduccion = async (receta_id, fecha, cantidad_producida, turno, id) => {
+    const query = "UPDATE produccion SET receta_id = ?, fecha = ?, cantidad_producida = ?, turno = ? WHERE id = ?";
     try{
-        const resultado = await pool.query(query, [r_id, fecha, cant_prod, cpt, cpu, cpum, turno, id]);
+        const resultado = await pool.query(query, [receta_id, fecha, cantidad_producida, turno, id]);
         return resultado[0];
     }catch(error){
         throw error;
     }
 }
 //DELETE
+export const changeStateOfProduccion = async (estado, id) => {
+    const query = "UPDATE produccion set estado = ? WHERE id = ?";
+    try{
+        const resultado = await pool.query(query, [estado, id]);
+        return resultado[0];
+    }catch(error){
+        throw error;
+    }
+}
