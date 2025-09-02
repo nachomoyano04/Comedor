@@ -1,4 +1,4 @@
-import { changeStateOfProduccion, getProducciones, insertProduccion, updateProduccion } from "../models/produccion.js";
+import { getCostosPrimosUnitarios, changeStateOfProduccion, getProducciones, insertProduccion, updateProduccion } from "../models/produccion.js";
 import { deleteProduccion_Insumo, getInsumosByProduccion, insertProduccion_Insumo, updateProduccion_Insumo } from "../models/produccion-insumo.js";
 
 export const nuevaProduccion = async (req, res) => {
@@ -109,5 +109,24 @@ export const eliminarInsumoDeProduccion = async (req, res) => {
     }catch(error){
         console.log(error);
         res.status(500).json({error: "Error al eliminar insumo de la producción"});
+    }
+}
+
+export const calcularCostoPrimoTotal = async (req, res) => {
+    const {id} = req.params;
+    try{
+        const resultado = await getCostosPrimosUnitarios(id);
+        let costo_primo_total = 0;
+        for(const r in resultado) {
+            if(resultado[r].hasOwnProperty("costo_primo_unitario")) {
+                let costo_primo_unitario = parseFloat(resultado[r]["costo_primo_unitario"]).toFixed(2);
+                costo_primo_unitario = parseFloat(costo_primo_unitario);
+                costo_primo_total += costo_primo_unitario;
+            }
+        }
+        return res.json(costo_primo_total);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({error: "Error al calcular costo primo total"});
     }
 }

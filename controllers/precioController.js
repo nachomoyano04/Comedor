@@ -1,8 +1,12 @@
-import { deletePrecio, getPrecioByInsumo, insertPrecio, updatePrecio } from "../models/precio.js";
+import { deletePrecio, getPrecioById, getPrecioByInsumo, insertPrecio, makeFechaNull, updateFechaHasta, updatePrecio } from "../models/precio.js";
 
 export const crearPrecio = async (req, res) => {
     const precio = req.body;
     try{
+        const precios = await getPrecioByInsumo(precio.insumo_id);
+        if(precios.length > 0){
+            await updateFechaHasta(precios[precios.length-1].id);
+        }
         const resultado = await insertPrecio(precio);
         if(resultado.affectedRows == 1){
             return res.json("Precio registrado.");
@@ -43,6 +47,11 @@ export const obtenerPrecioPorInsumo = async (req, res) => {
 export const borrarPrecio = async (req, res) => {
     const {id} = req.params;
     try{
+        const precio = await getPrecioById(id);
+        const precios = await getPrecioByInsumo(precio[0].insumo_id);
+        if(precios.length > 1){
+            await makeFechaNull(precios[precios.length-2].id);
+        }
         const resultado = await deletePrecio(id);
         if(resultado.affectedRows == 1){
             return res.json("Precio borrado");
