@@ -53,11 +53,11 @@ export const registerUser = async (rol_id, nombre, apellido, dni, cuil, telefono
 export const login = async (dni, password) => {
     const usuario = await findUsuarioByDNI(dni);
     if(!usuario){
-        throw json({error: "Usuario no encontrado"});
+        return json({error: "Usuario no encontrado"});
     }
     const passValida = await verificarPassword(usuario[0].password, password);
     if(!passValida){
-        throw json({error: "Password incorrecta"});
+        return json({error: "Password incorrecta"});
     }
     const access_token = generateAccessToken(usuario);
     const refresh_token = refreshAccessToken(usuario);
