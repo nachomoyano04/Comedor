@@ -23,6 +23,22 @@ export const getProducciones = async () => {
         throw error;
     }
 }
+
+export const getCostosPrimosUnitarios = async id => {
+    const query = `SELECT ins.producto, (pi.cantidad_usada * pre.precio_unitario) AS "costo_primo_unitario", pi.cantidad_usada
+                    FROM produccion_insumo AS pi
+                    JOIN produccion AS prod ON pi.produccion_id = prod.id
+                    JOIN insumo AS ins ON pi.insumo_id = ins.id
+                    JOIN precio AS pre ON pre.insumo_id = ins.id
+                    WHERE prod.fecha > pre.fecha_desde AND (pre.fecha_hasta IS NULL OR pre.fecha_hasta > prod.fecha) AND pi.produccion_id = ?`;
+    try{
+        const resultado = await pool.query(query, [id]);
+        return resultado[0];
+    }catch(error){
+        throw error;
+    }
+}
+
 //UPDATE
 export const updateProduccion = async (receta_id, fecha, cantidad_producida, turno, id) => {
     const query = "UPDATE produccion SET receta_id = ?, fecha = ?, cantidad_producida = ?, turno = ? WHERE id = ?";
