@@ -1,4 +1,5 @@
 import argon2 from "argon2";
+import jwt from "jsonwebtoken";
 import { findUsuarioByDNI, insertUsuario } from "../models/usuario.js";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "comedor_secret_access_123";
@@ -36,7 +37,10 @@ export const generateAccessToken = usuario => {
 
 //Renovamos token
 export const refreshAccessToken = usuario => {
-    return jwt.sign({id: usuario.id, dni: usuario.dni}, REFRESH_TOKEN_SECRET, {expiresIn: '7d'});
+    return jwt.sign(
+        {id: usuario.id, dni: usuario.dni}, 
+        REFRESH_TOKEN_SECRET, 
+        {expiresIn: '7d'});
 };
 
 //Creamos el usuario
@@ -52,12 +56,12 @@ export const registerUser = async (rol_id, nombre, apellido, dni, cuil, telefono
 
 export const login = async (dni, password) => {
     const usuario = await findUsuarioByDNI(dni);
-    if(!usuario){
-        return json({error: "Usuario no encontrado"});
+    if(usuario.length == 0){
+        return ({error: "Usuario no encontrado"});
     }
     const passValida = await verificarPassword(usuario[0].password, password);
     if(!passValida){
-        return json({error: "Password incorrecta"});
+        return ({error: "Password incorrecta"});
     }
     const access_token = generateAccessToken(usuario);
     const refresh_token = refreshAccessToken(usuario);

@@ -9,6 +9,7 @@ import recetaRouter from "./routes/recetaRoutes.js";
 import rolesRouter from "./routes/rolesRoutes.js";
 import unidad_de_medidaRouter from "./routes/unidad_de_medidaRoutes.js";
 import usuarioRouter from "./routes/usuarioRoutes.js";
+import cors from "cors";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ const PORT = process.env.PORT || 3000;
 
 //Middleware
 app.use(express.json());
+app.use(cors());
 
 //Rutas
 app.use("/insumos", insumosRouter);
