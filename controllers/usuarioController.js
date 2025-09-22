@@ -1,5 +1,5 @@
 import { changeStateUser, findUsuarioByDNI, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario.js";
-import { hashearPassword, login } from "../servicios/auth.js";
+import { hashearPassword, login } from "../services/auth.js";
 import { insertUsuario_Rol } from "../models/roles.js";
 
 export const nuevoUsuario = async (req, res) => {
@@ -140,10 +140,10 @@ export const cambiarPassword = async (req, res) => {
 export const loginUsuario = async (req, res) => {
     const {dni, password} = req.body;
     try {
-        console.log(dni, password);
         const tokens = await login(dni, password);
         return res.json(tokens);
     }catch(error) {
+        console.log(error);
         res.status(500).json({error: "Error al loguearse"});
     }
 }
