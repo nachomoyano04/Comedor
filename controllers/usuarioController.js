@@ -4,7 +4,8 @@ import { insertUsuario_Rol } from "../models/roles.js";
 import pool from "../config/database.js";
 
 export const nuevoUsuario = async (req, res) => {
-    const {nombre, apellido, dni, cuil, telefono, roles} = req.body;
+    console.log(req.body);
+    const {nombre, apellido, dni, cuil, telefono, rol} = req.body;
     const usuario = {nombre, apellido, dni, cuil, telefono};
     const connection = await pool.getConnection();
     try{
@@ -15,7 +16,7 @@ export const nuevoUsuario = async (req, res) => {
         const resultado = await insertUsuario(usuario, connection);
         
         const idUsuario = resultado.insertId;
-        for(const idRol of roles){
+        for(const idRol of rol){
             await insertUsuario_Rol({usuario_id: idUsuario, rol_id: idRol}, connection);
         }
         await connection.commit();
