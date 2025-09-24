@@ -1,20 +1,34 @@
 import { changeStateUser, findUsuarioByDNI, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario.js";
 import { hashearPassword, login } from "../services/auth.js";
 import { insertUsuario_Rol } from "../models/roles.js";
+import pool from "../config/database.js";
 
 export const nuevoUsuario = async (req, res) => {
-    const usuario = req.body;
+    const {nombre, apellido, dni, cuil, telefono, roles} = req.body;
+    const usuario = {nombre, apellido, dni, cuil, telefono};
+    const connection = await pool.getConnection();
     try{
+        await connection.beginTransaction();
         usuario.estado = 1;
         usuario.password = await hashearPassword(usuario.dni);
-        const resultado = await insertUsuario(usuario);
+        
+        const resultado = await insertUsuario(usuario, connection);
+        
+        const idUsuario = resultado.insertId;
+        for(const idRol of roles){
+            await insertUsuario_Rol({usuario_id: idUsuario, rol_id: idRol}, connection);
+        }
+        await connection.commit();
         if(resultado.affectedRows > 0){
             return res.json("Usuario registrado.");
         }
         return res.json("No se pudo registrar el usuario.");
     }catch(error){
+        await connection.rollback();
         console.log(error);
         res.status(500).json({error: "Error al crear nuevo usuario"});
+    }finally{
+        connection.release();
     }
 }
 
