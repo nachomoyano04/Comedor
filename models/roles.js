@@ -11,10 +11,10 @@ export const insertRol = async rol => {
     }
 }
 
-export const insertUsuario_Rol = async usuario_rol => {
+export const insertUsuario_Rol = async (usuario_rol, connection) => {
     const query = "INSERT INTO usuario_rol SET ?";
     try{
-        const resultado = await pool.query(query, usuario_rol);
+        const resultado = await connection.query(query, usuario_rol);
         return resultado[0];
     }catch(error){
         throw error;

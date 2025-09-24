@@ -1,10 +1,10 @@
 import pool from "../config/database.js";
 
 //CREATE
-export const insertUsuario = async usuario => {
+export const insertUsuario = async (usuario, connection) => {
     const query = "INSERT INTO usuario SET ?";
     try{
-        const resultado = await pool.query(query, usuario);
+        const resultado = await connection.query(query, usuario);
         return resultado[0];
     }catch(error){
         throw(error);
