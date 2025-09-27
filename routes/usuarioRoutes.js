@@ -12,7 +12,7 @@ router.patch("/pass/:id", cambiarPassword);
 router.get("/dni/:dni", buscarUsuarioPorDni);
 router.post("/rol", nuevoRolAUsuario);
 router.get("/rol/:rol_id", obtenerUsuariosPorRol);
-router.patch("/rol/:rol_id/cambiar/:id", cambiarRol);
+router.patch("/rol/:rol_id/cambiar/:id", cambiarRol); // <- ver si realmente nos sirve. Como puede ser mas de un rol...
 router.post("/login", loginUsuario)
 
 export default router;
