@@ -1,4 +1,4 @@
-import {activateInsumo, deleteInsumo, getInsumos, insertInsumo, updateInsumo} from "../models/insumos.js";
+import {activateInsumo, deleteInsumo, getInsumo, getInsumos, insertInsumo, updateInsumo} from "../models/insumos.js";
 
 export const listarInsumos = async (req, res) => {
     try{
@@ -7,6 +7,17 @@ export const listarInsumos = async (req, res) => {
     }catch(error){
         console.log(error);
         res.status(500).json({error: "Error al listar los insumos", mensaje: error.sqlMessage});
+    }
+}
+
+export const obtenerInsumo = async (req, res) => {
+    const {id} = req.params;
+    try {
+        const insumo = await getInsumo(id);
+        res.json(insumo);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error: "Error al obtener insumo", mensaje: error.sqlMessage});   
     }
 }
 
@@ -23,7 +34,6 @@ export const nuevoInsumo = async (req, res) => {
 
 export const editarInsumo = async (req, res) => {
     const {codigo, producto, marca, id_unidad_de_medida} = req.body
-    console.log(req.body);
     const {id} = req.params;
     try{
         const resultado = await updateInsumo(codigo, producto, marca, id_unidad_de_medida, id);
