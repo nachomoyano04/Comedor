@@ -1,6 +1,6 @@
 import { changeStateUser, findUsuarioByDNI, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario.js";
 import { hashearPassword, login } from "../services/auth.js";
-import { insertUsuario_Rol } from "../models/roles.js";
+import { deleteRolesFromUser, getRolesByUser, insertUsuario_Rol } from "../models/roles.js";
 import pool from "../config/database.js";
 
 export const nuevoUsuario = async (req, res) => {
@@ -35,16 +35,28 @@ export const nuevoUsuario = async (req, res) => {
 
 export const editarUsuario = async (req, res) => {
     const {id} = req.params
-    const {nombre, apellido, dni, cuil, telefono} = req.body;
+    const {nombre, apellido, dni, cuil, telefono, rol} = req.body;
+    const connection = await pool.getConnection();
     try{
-        const resultado = await updateUsuario(nombre, apellido, dni, cuil, telefono, id);
+        await connection.beginTransaction();
+        const resultado = await updateUsuario(nombre, apellido, dni, cuil, telefono, id, connection);
+        if(rol.length > 0){
+            await deleteRolesFromUser(id, connection);
+            for(const r of rol){
+                await insertUsuario_Rol({usuario_id: id, rol_id: r}, connection);
+            }
+        }
+        await connection.commit();
         if(resultado.affectedRows > 0){
             return res.json("Usuario editado.");
         }
         return res.json("No se pudo editar el usuario.");
     }catch(error){
+        await connection.rollback();
         console.log(error);
         res.status(500).json({error: "Error al editar usuario"});
+    }finally{
+        connection.release()
     }
 }
 

@@ -1,4 +1,4 @@
-import { deleteRol, getRoles, getRolesByUser, insertRol, updateRol } from "../models/roles.js";
+import { deleteRol, deleteRolesFromUser, getRoles, getRolesByUser, insertRol, updateRol } from "../models/roles.js";
 import { getUsuariosByRol } from "../models/usuario.js";
 
 export const listarRoles = async (req, res) => {

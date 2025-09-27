@@ -13,7 +13,7 @@ export const insertUsuario = async (usuario, connection) => {
 
 //READ
 export const getUsuarios = async () => {
-    const query = "SELECT * FROM usuario WHERE estado = 1";
+    const query = "SELECT * FROM usuario";
     try{
         const resultado = await pool.query(query);
         return resultado[0];
@@ -42,10 +42,10 @@ export const findUsuarioByDNI = async (dni) => {
 }
 
 //UPDATE
-export const updateUsuario = async (nombre, apellido, dni, cuil, telefono, id) => {
+export const updateUsuario = async (nombre, apellido, dni, cuil, telefono, id, connection) => {
     const query = "UPDATE usuario SET nombre = ?, apellido = ?, dni = ?, cuil = ?, telefono = ? WHERE id = ?";
     try{
-        const resultado = await pool.query(query, [nombre, apellido, dni, cuil, telefono, id]);
+        const resultado = await connection.query(query, [nombre, apellido, dni, cuil, telefono, id]);
         return resultado[0];
     }catch(error){
         throw(error);

@@ -62,3 +62,13 @@ export const deleteRol = async id => {
         throw error;
     }
 }
+
+export const deleteRolesFromUser = async (usuario_id, connection) => {
+    const query = "DELETE FROM usuario_rol WHERE usuario_id = ?";
+    try {
+        const resultado = await connection.query(query, [usuario_id]);
+        return resultado;
+    } catch (error) {
+        throw(error);
+    }
+}
