@@ -20,6 +20,16 @@ export const getInsumo = async id => {
     }
 }
 
+export const getInsumoByCodigo = async codigo => {
+    const query = "SELECT * FROM insumo WHERE codigo = ?";
+    try {
+        const insumo = await pool.query(query, [codigo]);
+        return insumo[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
 //CREATE
 export const insertInsumo = async insumo => {
     insumo.estado = 1;
