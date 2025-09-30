@@ -24,7 +24,10 @@ export const obtenerInsumo = async (req, res) => {
 export const nuevoInsumo = async (req, res) => {
     const insumo = req.body;
     try{
-        // const hayInsumo = await getInsumoByCodigo(insumo.codigo);
+        const hayInsumo = await getInsumoByCodigo(insumo.codigo);
+        if(hayInsumo.length > 0){
+            return res.status(500).json("Codigo duplicado");
+        }
         const resultado = await insertInsumo(insumo);
         if(resultado.affectedRows == 1){
             return res.json("Insumo creado");
@@ -40,6 +43,10 @@ export const editarInsumo = async (req, res) => {
     const {codigo, producto, marca, id_unidad_de_medida} = req.body
     const {id} = req.params;
     try{
+        const hayInsumo = await getInsumoByCodigo(codigo);
+        if(hayInsumo.length > 0 && hayInsumo[0].id != id){
+            return res.status(500).json("Codigo duplicado");
+        }
         const resultado = await updateInsumo(codigo, producto, marca, id_unidad_de_medida, id);
         if(resultado.affectedRows > 0){
             return res.json("Insumo editado");

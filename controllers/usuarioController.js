@@ -1,15 +1,20 @@
-import { changeStateUser, findUsuarioByDNI, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario.js";
+import { changeStateUser, findByDniOrCuil, findUsuarioByDNI, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario.js";
 import { hashearPassword, login } from "../services/auth.js";
 import { deleteRolesFromUser, getRolesByUser, insertUsuario_Rol } from "../models/roles.js";
 import pool from "../config/database.js";
 
 export const nuevoUsuario = async (req, res) => {
-    console.log(req.body);
     const {nombre, apellido, dni, cuil, telefono, rol} = req.body;
     const usuario = {nombre, apellido, dni, cuil, telefono};
     const connection = await pool.getConnection();
     try{
         await connection.beginTransaction();
+
+        //Chequeamos de que no haya otro usuario con ese dni o cuil...
+        const hayOtro = await findByDniOrCuil(dni, cuil);
+        if(hayOtro.length > 0){
+            return res.status(500).json("Dni o cuil ya existentes");
+        }
         usuario.estado = 1;
         usuario.password = await hashearPassword(usuario.dni);
         
@@ -39,6 +44,11 @@ export const editarUsuario = async (req, res) => {
     const connection = await pool.getConnection();
     try{
         await connection.beginTransaction();
+        //Chequeamos de que no haya otro con ese dni o cuil
+        const hayOtro = await findByDniOrCuil(dni, cuil, id);
+        if(hayOtro.length > 0 && hayOtro[0].id != id){
+            return res.status(500).json("Dni o cuil ya existentes");
+        }
         const resultado = await updateUsuario(nombre, apellido, dni, cuil, telefono, id, connection);
         if(rol.length > 0){
             await deleteRolesFromUser(id, connection);

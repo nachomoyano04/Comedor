@@ -41,6 +41,22 @@ export const findUsuarioByDNI = async (dni) => {
     }
 }
 
+export const findByDniOrCuil = async (dni, cuil, id) => {
+    try {
+        if(id == null){ // para registrar
+            const query = "SELECT * FROM usuario WHERE dni = ? or cuil = ?";
+            const resultado = await pool.query(query, [dni, cuil]);
+            return resultado[0];
+        } 
+        // para editar
+        const query = "SELECT * FROM usuario WHERE (dni = ? or cuil = ?) AND id != 1";
+        const resultado = await pool.query(query, [dni, cuil, id]);
+        return resultado[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
 //UPDATE
 export const updateUsuario = async (nombre, apellido, dni, cuil, telefono, id, connection) => {
     const query = "UPDATE usuario SET nombre = ?, apellido = ?, dni = ?, cuil = ?, telefono = ? WHERE id = ?";
