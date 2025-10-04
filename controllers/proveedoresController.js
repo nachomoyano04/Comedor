@@ -1,9 +1,14 @@
-import { deleteProveedor, activateProveedor, getProveedores, insertProveedor, updateProveedor } from "../models/proveedor.js";
+import { deleteProveedor, activateProveedor, getProveedores, insertProveedor, updateProveedor, getByCodigoCuitOrEmail } from "../models/proveedor.js";
 import { deleteContactoProveedor, getConProvByIdProveedor, insertContactoProveedor, updateContactoProveedor } from "../models/contacto_proveedor.js";
 
 export const nuevoProveedor = async (req, res) => {
     const proveedor = req.body;
     try{
+        //Chequeamos de que el codigo, cuit o email no coincida con ningun otro
+        const hayOtraCoincidencia = await getByCodigoCuitOrEmail(proveedor.codigo, proveedor.cuit, proveedor.email);
+        if(hayOtraCoincidencia.length > 0){
+            return res.status(500).json("Se encontró una coincidencia en CUIT, codigo o email");
+        }
         const resultado = await insertProveedor(proveedor);
         if(resultado.affectedRows == 1){
             return res.json("Proveedor registrado.");
