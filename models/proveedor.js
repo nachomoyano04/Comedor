@@ -13,7 +13,7 @@ export const insertProveedor = async (proveedor) => {
 }
 //READ
 export const getProveedores = async () => {
-    const query = "SELECT * FROM proveedor WHERE estado = 1";
+    const query = "SELECT * FROM proveedor";
     try{
         const resultado = await pool.query(query);
         return resultado[0];
@@ -21,6 +21,17 @@ export const getProveedores = async () => {
         throw error;
     }
 }
+
+export const getByCodigoCuitOrEmail = async (codigo, cuit, email) => {
+    const query = "SELECT * FROM proveedor WHERE codigo = ? OR cuit = ? OR email = ?";
+    try {
+        const resultado = await pool.query(query, [codigo, cuit, email]);
+        return resultado[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
 //UPDATE
 export const updateProveedor = async (cdgo, rs, nf, cuit, ha, dclio, lc, email, id) => {
     const query = "UPDATE proveedor SET codigo = ?, razon_social = ?, nombre_fantasia = ?, cuit = ?, horarios_atencion = ?, domicilio = ?, localidad = ?, email = ? WHERE id = ?";
