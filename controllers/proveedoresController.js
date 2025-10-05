@@ -1,4 +1,4 @@
-import { deleteProveedor, activateProveedor, getProveedores, insertProveedor, updateProveedor, getByCodigoCuitOrEmail } from "../models/proveedor.js";
+import { deleteProveedor, activateProveedor, getProveedores, getProveedor, insertProveedor, updateProveedor, getByCodigoCuitOrEmail } from "../models/proveedor.js";
 import { deleteContactoProveedor, getConProvByIdProveedor, insertContactoProveedor, updateContactoProveedor } from "../models/contacto_proveedor.js";
 
 export const nuevoProveedor = async (req, res) => {
@@ -42,6 +42,17 @@ export const obtenerProveedores = async (req, res) => {
     }catch(error){
         console.log(error);
         res.status(500).json({error: "Error al obtener proveedores", message: error.sqlMessage});
+    }
+}
+
+export const obtenerProveedor = async (req, res) => {
+    const {id} = req.params;
+    try {
+        const resultado = await getProveedor(id);
+        return res.json(resultado);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error: "Error al obtener proveedor", message: error.sqlMessage});
     }
 }
 

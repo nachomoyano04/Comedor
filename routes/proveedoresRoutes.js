@@ -1,9 +1,10 @@
 import express from "express";
-import { borrarContactoProveedor, borrarProveedor, activarProveedor, editarContactoProveedor, editarProveedor, nuevoContactoProveedor, nuevoProveedor, obtenerContactosPorProveedor, obtenerProveedores } from "../controllers/proveedoresController.js";
+import { borrarContactoProveedor, obtenerProveedor, borrarProveedor, activarProveedor, editarContactoProveedor, editarProveedor, nuevoContactoProveedor, nuevoProveedor, obtenerContactosPorProveedor, obtenerProveedores } from "../controllers/proveedoresController.js";
 
 const router = express.Router();
 
 router.get("/", obtenerProveedores);
+router.get("/:id", obtenerProveedor);
 router.post("/", nuevoProveedor);
 router.put("/:id", editarProveedor);
 router.patch("/del/:id", borrarProveedor);

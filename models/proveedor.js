@@ -22,6 +22,16 @@ export const getProveedores = async () => {
     }
 }
 
+export const getProveedor = async id => {
+    const query = "SELECT * FROM proveedor WHERE id = ?"    
+    try {
+        const resultado = await pool.query(query, [id]);
+        return resultado[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const getByCodigoCuitOrEmail = async (codigo, cuit, email) => {
     const query = "SELECT * FROM proveedor WHERE codigo = ? OR cuit = ? OR email = ?";
     try {
