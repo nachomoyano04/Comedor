@@ -32,11 +32,17 @@ export const getProveedor = async id => {
     }
 }
 
-export const getByCodigoCuitOrEmail = async (codigo, cuit, email) => {
-    const query = "SELECT * FROM proveedor WHERE codigo = ? OR cuit = ? OR email = ?";
+export const getByCodigoCuitOrEmail = async (codigo, cuit, email, id) => {
     try {
-        const resultado = await pool.query(query, [codigo, cuit, email]);
-        return resultado[0];
+        if(id == null){ //para registrar
+            const query = "SELECT * FROM proveedor WHERE codigo = ? OR cuit = ? OR email = ?";
+            const resultado = await pool.query(query, [codigo, cuit, email]);
+            return resultado[0];
+        }else{ //para editar
+            const query = "SELECT * FROM proveedor WHERE (codigo = ? OR cuit = ? OR email = ?) AND (id != ?)";
+            const resultado = await pool.query(query, [codigo, cuit, email, id]);
+            return resultado[0];
+        }
     } catch (error) {
         throw error;
     }

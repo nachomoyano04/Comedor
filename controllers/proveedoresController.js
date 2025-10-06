@@ -24,6 +24,11 @@ export const editarProveedor = async (req, res) => {
     const {id} = req.params;
     const {codigo, razon_social, nombre_fantasia, cuit, horarios_atencion, domicilio, localidad, email} = req.body;
     try{
+        //Chequeamos de que no haya otro proveedor con ese cuit, codigo o email
+        const hayOtraCoincidencia = await getByCodigoCuitOrEmail(codigo, cuit, email, id);
+        if(hayOtraCoincidencia.length > 0){
+            return res.status(500).json("Se encontró una coincidencia en CUIT, codigo o email");
+        }
         const resultado = await updateProveedor(codigo, razon_social, nombre_fantasia, cuit, horarios_atencion, domicilio, localidad, email, id);
         if(resultado.affectedRows == 1){
             return res.json("Proveedor editado.");
