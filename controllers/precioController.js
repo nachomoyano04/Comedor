@@ -12,8 +12,8 @@ export const crearPrecio = async (req, res) => {
             await updateFechaHasta(precios[precios.length-1].id, connection);
         }
         const resultadoPrecio = await insertPrecio(precio, connection);
-        const insumo = await getInsumo(precio.insumo_id);
-        const stock = parseInt(insumo[0].stock) + parseInt(precio.cantidad);
+        const insumo = await getInsumo(precio.insumo_id, connection);
+        const stock = parseInt(insumo.stock) + parseInt(precio.cantidad);
         const resultadoStock = await updateStockInsumo(precio.insumo_id, stock, connection);
         if(resultadoPrecio.affectedRows == 1 && resultadoStock.affectedRows == 1){
             await connection.commit();
@@ -81,8 +81,10 @@ export const borrarPrecio = async (req, res) => {
             await makeFechaNull(precios[precios.length-2].id, connection);
         }
         const resultado = await deletePrecio(id, connection);
-        const insumo = await getInsumo(insumo_id);
-        const stock = insumo.stock >= precio.cantidad? insumo.stock - precio.cantidad : 0;  
+        const insumo = await getInsumo(insumo_id, connection);
+        const stockInsumo = parseInt(insumo.stock);
+        const cantidadPrecio = parseInt(precio.cantidad);
+        const stock = stockInsumo >= cantidadPrecio? stockInsumo - cantidadPrecio : 0;  
         await updateStockInsumo(insumo_id, stock, connection);
         await connection.commit();
         if(resultado.affectedRows == 1){

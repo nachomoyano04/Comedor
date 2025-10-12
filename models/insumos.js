@@ -10,11 +10,11 @@ export const getInsumos = async () => {
     }
 }
 
-export const getInsumo = async id => {
+export const getInsumo = async (id, connection) => {
     const query = "SELECT * FROM insumo WHERE id = ?";
     try {
-        const insumo = await pool.query(query, [id]);
-        return insumo[0];
+        const insumo = await connection.query(query, [id]);
+        return insumo[0][0];
     } catch (error) {
         throw error;
     }
