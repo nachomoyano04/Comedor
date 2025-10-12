@@ -1,20 +1,32 @@
-import { deletePrecio, getPrecioById, getPrecioByInsumo, insertPrecio, makeFechaNull, updateFechaHasta, updatePrecio } from "../models/precio.js";
+import pool from "../config/database.js";
+import { getInsumo, updateStockInsumo } from "../models/insumos.js";
+import { deletePrecio, getPrecioById, getPrecioByInsumo, getPrecios, insertPrecio, makeFechaNull, updateFechaHasta, updatePrecio } from "../models/precio.js";
 
 export const crearPrecio = async (req, res) => {
     const precio = req.body;
+    const connection = await pool.getConnection();
     try{
-        const precios = await getPrecioByInsumo(precio.insumo_id);
+        await connection.beginTransaction();
+        const precios = await getPrecioByInsumo(precio.insumo_id, connection);
         if(precios.length > 0){
-            await updateFechaHasta(precios[precios.length-1].id);
+            await updateFechaHasta(precios[precios.length-1].id, connection);
         }
-        const resultado = await insertPrecio(precio);
-        if(resultado.affectedRows == 1){
+        const resultadoPrecio = await insertPrecio(precio, connection);
+        const insumo = await getInsumo(precio.insumo_id);
+        const stock = parseInt(insumo[0].stock) + parseInt(precio.cantidad);
+        const resultadoStock = await updateStockInsumo(precio.insumo_id, stock, connection);
+        if(resultadoPrecio.affectedRows == 1 && resultadoStock.affectedRows == 1){
+            await connection.commit();
             return res.json("Precio registrado.");
         }
-        return res.json("No se pudo registrar el precio.");
+        await connection.rollback()
+        return res.status(500).json("No se pudo registrar el precio.");
     }catch(error){
+        await connection.rollback()
         console.log(error); 
         res.status(500).json({error: "Error al crear precio"});
+    }finally{
+        connection.release();
     }
 }
 
@@ -33,10 +45,21 @@ export const editarPrecio = async (req, res) => {
     }
 }
 
+export const obtenerPrecios = async (req, res) => {
+    try {
+        const resultado = await getPrecios();
+        return res.json(resultado);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error: "Error al obtener todos los precios"});
+    }
+}
+
 export const obtenerPrecioPorInsumo = async (req, res) => {
     const {insumo_id} = req.params;
+    const connection = await pool.getConnection();
     try{
-        const resultado = await getPrecioByInsumo(insumo_id);
+        const resultado = await getPrecioByInsumo(insumo_id, connection);
         return res.json(resultado);
     }catch(error){
         console.log(error);
@@ -46,18 +69,28 @@ export const obtenerPrecioPorInsumo = async (req, res) => {
 
 export const borrarPrecio = async (req, res) => {
     const {id} = req.params;
+    const connection = await pool.getConnection();
     try{
-        const precio = await getPrecioById(id);
-        const precios = await getPrecioByInsumo(precio[0].insumo_id);
+        await connection.beginTransaction();
+        const precio = await getPrecioById(id, connection);
+        const {insumo_id} = precio;
+        const precios = await getPrecioByInsumo(insumo_id, connection);
         if(precios.length > 1){
-            await makeFechaNull(precios[precios.length-2].id);
+            await makeFechaNull(precios[precios.length-2].id, connection);
         }
-        const resultado = await deletePrecio(id);
+        const resultado = await deletePrecio(id, connection);
+        const insumo = await getInsumo(insumo_id);
+        const stock = insumo.stock >= precio.cantidad? insumo.stock - precio.cantidad : 0;  
+        await updateStockInsumo(insumo_id, stock, connection);
+        await connection.commit();
         if(resultado.affectedRows == 1){
             return res.json("Precio borrado");
         }
         return res.json("No se pudo borrar el precio");
     }catch(error){
+        await connection.rollback();
         res.status(500).json({error: "Error al borrar el precio"});
+    } finally{
+        connection.release();
     }
 }

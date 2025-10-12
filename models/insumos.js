@@ -53,6 +53,16 @@ export const updateInsumo = async (c, p, m, udm, id) => {
     }
 }
 
+export const updateStockInsumo = async (insumo_id, stock, connection) => {
+    const query = "UPDATE insumo SET stock = ? WHERE id = ?";
+    try {
+        const resultado = await connection.query(query, [stock, insumo_id]);
+        return resultado[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
 //DELETE
 export const deleteInsumo = async id => {
     const query = "UPDATE insumo SET estado = 0 WHERE id = ?";
