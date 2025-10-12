@@ -64,6 +64,8 @@ export const obtenerPrecioPorInsumo = async (req, res) => {
     }catch(error){
         console.log(error);
         res.status(500).json({error: "Error al obtener precio"});
+    }finally{
+        connection.release();
     }
 }  
 
