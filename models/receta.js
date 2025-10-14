@@ -8,15 +8,15 @@ export const insertReceta = async receta => {
     const query = "INSERT INTO receta SET ?";
     try{
         const resultado = await pool.query(query, receta);
-        return resultado[0];
+        return resultado[0].insertId; // devolvemos el id creado
     }catch(error){
         throw error;
     }
 }
 
 //READ
-export const getRecetasActivas = async id => {
-    const query = "SELECT * FROM receta WHERE estado = 1";
+export const getRecetas = async id => {
+    const query = "SELECT * FROM receta";
     try{
         const resultado = await pool.query(query, [id]);
         return resultado[0];

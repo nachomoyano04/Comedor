@@ -1,23 +1,33 @@
-import { activateReceta, deleteReceta, getRecetasActivas, insertReceta, updateReceta } from "../models/receta.js";
+import { activateReceta, deleteReceta, getRecetas, insertReceta, updateReceta } from "../models/receta.js";
 import { deleteReceta_Insumo, insertReceta_Insumo, updateReceta_Insumo } from "../models/receta-insumo.js";
+import dayjs from "dayjs";
+import pool from "../config/database.js";
 
 export const nuevaReceta = async (req, res) => {
-    const receta = req.body;
+    const {nombre, descripcion, insumo} = req.body;
+    const connection = await pool.getConnection();
     try{
-        const resultado = await insertReceta(receta);
-        if(resultado.affectedRows == 1){
-            return res.json("Receta registrada.");
+        const fecha = dayjs().format("YYYY-MM-DD HH:mm:ss");
+        const estado = 1;
+        const receta = {nombre, descripcion, fecha, estado}
+        const id = await insertReceta(receta);
+        for(const i of insumo){
+            await insertReceta_Insumo({receta_id: id, insumo_id: i.value, cantidad: i.cantidad})
         }
-        return res.json("No se pudo registrar la receta.");
+        await connection.commit();
+        return res.json("Receta registrada.");
     }catch(error) {
+        await connection.rollback();
         console.log(error);
         res.status(500).json({error: "Error al registrar nueva receta"});
+    }finally{
+        connection.release();
     }
 }
 
 export const obtenerRecetas = async (req, res) => {
     try{
-        const resultado = await getRecetasActivas();
+        const resultado = await getRecetas();
         return res.json(resultado);
     }catch(error) {
         console.log(error);
