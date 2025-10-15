@@ -1,4 +1,4 @@
-import { activateReceta, deleteReceta, getRecetas, insertReceta, updateReceta } from "../models/receta.js";
+import { activateReceta, deleteReceta, getRecetaById, getRecetas, insertReceta, updateReceta } from "../models/receta.js";
 import { deleteReceta_Insumo, insertReceta_Insumo, updateReceta_Insumo } from "../models/receta-insumo.js";
 import dayjs from "dayjs";
 import pool from "../config/database.js";
@@ -32,6 +32,17 @@ export const obtenerRecetas = async (req, res) => {
     }catch(error) {
         console.log(error);
         res.status(500).json({error: "Error al obtener recetas"});
+    }
+}
+
+export const obtenerRecetaPorId = async (req, res) => {
+    const {id} = req.params;
+    try {
+        const resultado = await getRecetaById(id);
+        return res.json(resultado);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error: "Error al obtener receta"});
     }
 }
 
