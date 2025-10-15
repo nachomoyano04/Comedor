@@ -16,7 +16,7 @@ export const insertReceta = async receta => {
 
 //READ
 export const getRecetas = async id => {
-    const query = "SELECT * FROM receta";
+    const query = "SELECT r.id, r.estado, r.nombre, r.descripcion, ri.cantidad, ri.insumo_id, i.producto, udm.simbolo FROM receta AS r JOIN receta_insumo AS ri ON r.id = ri.receta_id JOIN insumo AS i ON i.id = ri.insumo_id JOIN unidad_de_medida AS udm ON udm.id = i.id_unidad_de_medida";
     try{
         const resultado = await pool.query(query, [id]);
         return resultado[0];
