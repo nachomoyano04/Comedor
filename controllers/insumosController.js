@@ -1,4 +1,5 @@
-import {activateInsumo, deleteInsumo, getInsumo, getInsumoByCodigo, getInsumos, insertInsumo, updateInsumo} from "../models/insumos.js";
+import pool from "../config/database.js";
+import {activateInsumo, deleteInsumo, getInsumo, getInsumoByCodigo, getInsumos, getInsumosParaReceta, insertInsumo, updateInsumo} from "../models/insumos.js";
 
 export const listarInsumos = async (req, res) => {
     try{
@@ -9,15 +10,27 @@ export const listarInsumos = async (req, res) => {
         res.status(500).json({error: "Error al listar los insumos", mensaje: error.sqlMessage});
     }
 }
+export const listarInsumosParaReceta = async (req, res) => {
+    try{
+        const insumos = await getInsumosParaReceta();
+        return res.json(insumos);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({error: "Error al listar los insumos", mensaje: error.sqlMessage});
+    }
+}
 
 export const obtenerInsumo = async (req, res) => {
     const {id} = req.params;
+    const connection = await pool.getConnection();
     try {
-        const insumo = await getInsumo(id);
+        const insumo = await getInsumo(id, connection);
         return res.json(insumo);
     } catch (error) {
         console.log(error);
         res.status(500).json({error: "Error al obtener insumo", mensaje: error.sqlMessage});   
+    } finally {
+        connection.release();
     }
 }
 
