@@ -36,10 +36,10 @@ export const getRecetaById = async id => {
 }
 
 //UPDATE
-export const updateReceta = async (nombre, descripcion, precio_unitario, importe, id) => {
-    const query = "UPDATE receta SET nombre = ?, descripcion = ?, precio_unitario = ?, importe = ? WHERE id = ?";
+export const updateReceta = async (nombre, descripcion, id) => {
+    const query = "UPDATE receta SET nombre = ?, descripcion = ? WHERE id = ?";
     try{
-        const resultado = await pool.query(query, [nombre, descripcion, precio_unitario, importe, id]);
+        const resultado = await pool.query(query, [nombre, descripcion, id]);
         return resultado[0];
     }catch(error){
         throw error;
