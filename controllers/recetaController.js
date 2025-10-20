@@ -1,5 +1,5 @@
 import { activateReceta, deleteReceta, getRecetaById, getRecetas, insertReceta, updateReceta } from "../models/receta.js";
-import { deleteReceta_Insumo, insertReceta_Insumo, updateReceta_Insumo } from "../models/receta-insumo.js";
+import { deleteInsumosDeReceta, deleteReceta_Insumo, insertReceta_Insumo, updateReceta_Insumo } from "../models/receta-insumo.js";
 import dayjs from "dayjs";
 import pool from "../config/database.js";
 
@@ -48,16 +48,22 @@ export const obtenerRecetaPorId = async (req, res) => {
 
 export const editarReceta = async (req, res) => {
     const {id} = req.params;
-    const {nombre, descripcion, precio_unitario, importe} = req.body;
-    try{
-        const resultado = await updateReceta(nombre, descripcion, precio_unitario, importe, id);
-        if(resultado.affectedRows == 1){
-            return res.json("Receta editada.")
+    const {nombre, descripcion, insumo} = req.body;
+    const connection = await pool.getConnection();
+    try{ 
+        await updateReceta(nombre, descripcion, id); //Le cambiamos el nombre y la descripcion...
+        await deleteInsumosDeReceta(id); //Eliminamos los insumos que tenia la receta 
+        for(const i of insumo){ //Agregamos todos los insumos...
+            await insertReceta_Insumo({receta_id: id, insumo_id: i.value, cantidad: i.cantidad}); 
         }
-        return res.json("No se pudo editar la receta");
+        await connection.commit();
+        return res.json("Receta editada.")
     }catch(error) {
+        await connection.rollback();
         console.log(error);
         res.status(500).json({error: "Error al editar receta"});
+    }finally{
+        connection.release();
     }
 }
 

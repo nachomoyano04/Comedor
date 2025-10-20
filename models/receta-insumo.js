@@ -40,3 +40,13 @@ export const deleteReceta_Insumo = async (id) => {
         throw error;
     }
 }
+
+export const deleteInsumosDeReceta = async id => {
+    const query = "DELETE FROM receta_insumo WHERE receta_id = ?";
+    try {
+        const resultado = await pool.query(query, [id]);
+        return resultado[0];
+    } catch (error) {
+        throw error;
+    }
+}
