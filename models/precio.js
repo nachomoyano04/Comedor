@@ -47,6 +47,22 @@ export const getPrecioByInsumo = async (id, connection) => {
     }
 }
 
+export const getPrecioActualInsumo = async (id, connection) => {
+    const query = `SELECT p.precio_unitario
+                    FROM precio AS p
+                    JOIN insumo AS i ON p.insumo_id = i.id
+                    JOIN proveedor AS prov ON p.proveedor_id = prov.id
+                    WHERE p.insumo_id = ?
+                    ORDER BY fecha_desde DESC
+                    LIMIT 1`;
+    try {
+        const resultado = await connection.query(query, [id]);
+        return resultado[0][0];
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const getPrecioById = async (id, connection) => {
     const query = "SELECT * FROM precio WHERE id = ?";
     try{
