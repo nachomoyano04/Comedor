@@ -1,17 +1,37 @@
-import { getCostosPrimosUnitarios, changeStateOfProduccion, getProducciones, insertProduccion, updateProduccion } from "../models/produccion.js";
+import { getCostosPrimosUnitarios, changeStateOfProduccion, getProducciones, insertProduccion, updateProduccion, updateCostoPrimoTotalProduccion } from "../models/produccion.js";
 import { deleteProduccion_Insumo, getInsumosByProduccion, insertProduccion_Insumo, updateProduccion_Insumo } from "../models/produccion-insumo.js";
+import pool from "../config/database.js";
+import { getPrecioActualInsumo } from "../models/precio.js";
 
 export const nuevaProduccion = async (req, res) => {
-    const produccion = req.body;
+    const {insumos, ...produccion} = req.body;
+    const connection = await pool.getConnection();
     try{
-        const resultado = await insertProduccion(produccion);
-        if(resultado.affectedRows == 1){
-            return res.json("Produccion registrada.");
+        await connection.beginTransaction();
+        const result = await insertProduccion(produccion, connection);
+        const produccion_id = result.insertId;
+        let costo_primo_total = 0;
+        for(const i of insumos){
+            const resPrecio = await getPrecioActualInsumo(i.value, connection);
+            if(resPrecio){
+                const {precio_unitario} = resPrecio;
+                costo_primo_total += parseFloat(precio_unitario) * parseFloat(i.cantidad);
+                await insertProduccion_Insumo({produccion_id, insumo_id: i.value, cantidad_usada: i.cantidad}, connection);
+            }else{
+                await connection.rollback();
+                return res.status(500).json({error: `El insumo "${i.label}" no tiene un precio asignado...`});
+            }
         }
-        return res.json("No se pudo registrar la producción.");
+        await updateCostoPrimoTotalProduccion(costo_primo_total, produccion_id, connection);
+        console.log(costo_primo_total);
+        await connection.commit();
+        return res.json("Produccion registrada.");
     }catch(error){
+        await connection.rollback();
         console.log(error);
         res.status(500).json({error: "Error al registrar nueva producción."});
+    }finally{
+        connection.release();
     }
 }
 
@@ -58,8 +78,9 @@ export const altaBajaProduccion = async (req, res) => {
 
 export const agregarInsumoALaProduccion = async (req, res) => {
     const produccion_insumo = req.body;
+    const connection = await pool.getConnection();
     try{
-        const resultado = await insertProduccion_Insumo(produccion_insumo);
+        const resultado = await insertProduccion_Insumo(produccion_insumo, connection);
         if(resultado.affectedRows == 1){
             return res.json("Insumo agregado a la producción.")
         }
@@ -67,6 +88,8 @@ export const agregarInsumoALaProduccion = async (req, res) => {
     }catch(error){
         console.log(error);
         res.status(500).json({error: "Error al agregar insumo a la produccion"});
+    } finally {
+        connection.release();
     }
 }
 

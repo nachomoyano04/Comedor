@@ -1,10 +1,10 @@
 import pool from "../config/database.js";
 
 //CREATE
-export const insertProduccion_Insumo = async produccion_insumo => {
+export const insertProduccion_Insumo = async (produccion_insumo, connection) => {
     const query = "INSERT INTO produccion_insumo SET ?";
     try{
-        const resultado = await pool.query(query, produccion_insumo);
+        const resultado = await connection.query(query, produccion_insumo);
         return resultado[0];
     }catch(error){
         throw error;
