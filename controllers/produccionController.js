@@ -1,4 +1,4 @@
-import { getCostosPrimosUnitarios, changeStateOfProduccion, getProducciones, insertProduccion, updateProduccion, updateCostoPrimoTotalProduccion } from "../models/produccion.js";
+import { getCostosPrimosUnitarios, changeStateOfProduccion, getProducciones, insertProduccion, updateProduccion, updateCostoPrimoTotalProduccion, getProduccionById } from "../models/produccion.js";
 import { deleteProduccion_Insumo, getInsumosByProduccion, insertProduccion_Insumo, updateProduccion_Insumo } from "../models/produccion-insumo.js";
 import pool from "../config/database.js";
 import { getPrecioActualInsumo } from "../models/precio.js";
@@ -57,6 +57,20 @@ export const obtenerProducciones = async (req, res) => {
     }catch(error){
         console.log(error);
         res.status(500).json({error: "Error al obtener producciones"});
+    }
+}
+
+export const obtenerProduccionPorId = async (req, res) => {
+    const {id} = req.params;
+    const connection = await pool.getConnection();
+    try {
+        const resultado = await getProduccionById(id, connection);
+        return res.json(resultado);        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error: "Error al obtener la produccion"});
+    } finally {
+        connection.release();
     }
 }
 

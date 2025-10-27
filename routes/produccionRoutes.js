@@ -1,9 +1,10 @@
 import express from "express";
-import { agregarInsumoALaProduccion, altaBajaProduccion, editarProduccion, eliminarInsumoDeProduccion, modificarInsumoDeProduccion, nuevaProduccion, obtenerProducciones, insumosPorProduccion, calcularCostoPrimoTotal } from "../controllers/produccionController.js";
+import { agregarInsumoALaProduccion, altaBajaProduccion, editarProduccion, eliminarInsumoDeProduccion, modificarInsumoDeProduccion, nuevaProduccion, obtenerProducciones, insumosPorProduccion, calcularCostoPrimoTotal, obtenerProduccionPorId } from "../controllers/produccionController.js";
 
 const router = express.Router();
 
 router.get("/", obtenerProducciones);
+router.get("/:id", obtenerProduccionPorId);
 router.post("/", nuevaProduccion);
 router.put("/:id", editarProduccion);
 router.patch("/:id/estado/:num", altaBajaProduccion);
