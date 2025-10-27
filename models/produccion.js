@@ -17,16 +17,35 @@ export const insertProduccion = async (produccion, connection) => {
 export const getProducciones = async () => {
     const query = `SELECT p.id, p.fecha, p.cantidad_producida, p.costo_primo_total, 
                     p.cantidad_comensales, p.turno, p.estado, r.nombre, r.descripcion, 
-                    i.producto, pi.cantidad_usada, udm.simbolo 
+                    i.producto, pi.cantidad_usada, udm.simbolo, pi.insumo_id 
                     FROM produccion AS p 
                     JOIN receta AS r ON p.receta_id = r.id 
                     JOIN produccion_insumo AS pi ON pi.produccion_id = p.id 
                     JOIN insumo AS i ON pi.insumo_id = i.id 
-                    JOIN unidad_de_medida AS udm ON i.id_unidad_de_medida = udm.id`;
+                    JOIN unidad_de_medida AS udm ON i.id_unidad_de_medida = udm.id
+                    ORDER BY p.fecha DESC`;
     try{
         const resultado = await pool.query(query);
         return resultado[0];
     }catch(error){
+        throw error;
+    }
+}
+
+export const getProduccionById = async (id, connection) => {
+    const query = `SELECT p.id, p.fecha, p.cantidad_producida, p.costo_primo_total, 
+                    p.cantidad_comensales, p.turno, p.estado, r.nombre, r.descripcion, 
+                    i.producto, pi.cantidad_usada, udm.simbolo, pi.insumo_id 
+                    FROM produccion AS p 
+                    JOIN receta AS r ON p.receta_id = r.id 
+                    JOIN produccion_insumo AS pi ON pi.produccion_id = p.id 
+                    JOIN insumo AS i ON pi.insumo_id = i.id 
+                    JOIN unidad_de_medida AS udm ON i.id_unidad_de_medida = udm.id
+                    WHERE p.id = ?;`
+    try {
+        const resultado = await connection.query(query, [id]);
+        return resultado[0];
+    } catch (error) {
         throw error;
     }
 }
