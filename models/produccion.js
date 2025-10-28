@@ -35,7 +35,7 @@ export const getProducciones = async () => {
 export const getProduccionById = async (id, connection) => {
     const query = `SELECT p.id, p.fecha, p.cantidad_producida, p.costo_primo_total, 
                     p.cantidad_comensales, p.turno, p.estado, r.nombre, r.descripcion, 
-                    i.producto, pi.cantidad_usada, udm.simbolo, pi.insumo_id 
+                    i.producto, pi.cantidad_usada, udm.simbolo, pi.insumo_id, p.receta_id 
                     FROM produccion AS p 
                     JOIN receta AS r ON p.receta_id = r.id 
                     JOIN produccion_insumo AS pi ON pi.produccion_id = p.id 
@@ -66,11 +66,11 @@ export const getCostosPrimosUnitarios = async id => {
 }
 
 //UPDATE
-export const updateProduccion = async (receta_id, fecha, cantidad_producida, turno, id) => {
-    const query = "UPDATE produccion SET receta_id = ?, fecha = ?, cantidad_producida = ?, turno = ? WHERE id = ?";
+export const updateProduccion = async (receta_id, fecha, cantidad_producida, turno, cantidad_comensales, id, connection) => {
+    const query = "UPDATE produccion SET receta_id = ?, fecha = ?, cantidad_producida = ?, turno = ?, cantidad_comensales = ? WHERE id = ?";
     try{
-        const resultado = await pool.query(query, [receta_id, fecha, cantidad_producida, turno, id]);
-        return resultado[0];
+        const resultado = await connection.query(query, [receta_id, fecha, cantidad_producida, turno, cantidad_comensales, id]);
+        return resultado[0];    
     }catch(error){
         throw error;
     }

@@ -39,10 +39,10 @@ export const updateProduccion_Insumo = async(produccion_id, insumo_id, cantidad_
     }
 }
 //DELETE
-export const deleteProduccion_Insumo = async id => {
-    const query = "DELETE FROM produccion_insumo WHERE id = ?";
+export const deleteInsumosDeProduccion = async (produccion_id, connection) => {
+    const query = "DELETE FROM produccion_insumo WHERE produccion_id = ?";
     try{
-        const resultado = await pool.query(query, [id]);
+        const resultado = await connection.query(query, [produccion_id]);
         return resultado[0];
     }catch(error){
         throw error;

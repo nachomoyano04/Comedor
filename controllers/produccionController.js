@@ -1,5 +1,5 @@
 import { getCostosPrimosUnitarios, changeStateOfProduccion, getProducciones, insertProduccion, updateProduccion, updateCostoPrimoTotalProduccion, getProduccionById } from "../models/produccion.js";
-import { deleteProduccion_Insumo, getInsumosByProduccion, insertProduccion_Insumo, updateProduccion_Insumo } from "../models/produccion-insumo.js";
+import { deleteInsumosDeProduccion, getInsumosByProduccion, insertProduccion_Insumo, updateProduccion_Insumo } from "../models/produccion-insumo.js";
 import pool from "../config/database.js";
 import { getPrecioActualInsumo } from "../models/precio.js";
 
@@ -23,7 +23,6 @@ export const nuevaProduccion = async (req, res) => {
             }
         }
         await updateCostoPrimoTotalProduccion(costo_primo_total, produccion_id, connection);
-        console.log(costo_primo_total);
         await connection.commit();
         return res.json("Produccion registrada.");
     }catch(error){
@@ -37,16 +36,30 @@ export const nuevaProduccion = async (req, res) => {
 
 export const editarProduccion = async (req, res) => {
     const {id} = req.params;
-    const {receta_id, fecha, cantidad_producida, turno} = req.body;
+    const {receta_id, fecha, cantidad_producida, turno, cantidad_comensales, insumos} = req.body;
+    const connection = await pool.getConnection();
     try{
-        const resultado = await updateProduccion(receta_id, fecha, cantidad_producida, turno, id);
-        if(resultado.affectedRows == 1){
-            return res.json("Producción editada.");
+        await connection.beginTransaction();
+        await updateProduccion(receta_id, fecha, cantidad_producida, turno, cantidad_comensales, id, connection);
+        let costo_primo_total = 0;
+        await deleteInsumosDeProduccion(id, connection);
+        for(const i of insumos){
+            const resPrecio = await getPrecioActualInsumo(i.value, connection);
+            if(resPrecio){
+                const {precio_unitario} = resPrecio;
+                costo_primo_total += parseFloat(precio_unitario) * parseFloat(i.cantidad);
+            }
+            await insertProduccion_Insumo({insumo_id: i.value, produccion_id: id, cantidad_usada: i.cantidad}, connection);
         }
-        return res.json("No se pudo editar la producción.");
+        await updateCostoPrimoTotalProduccion(costo_primo_total, id, connection)//actualizar costo_primo_total
+        await connection.commit();
+        return res.json("Producción editada.");
     }catch(error){
+        await connection.rollback();
         console.log(error);
         res.status(500).json({error: "Error al editar produccion"});
+    }finally{
+        connection.release();
     }
 }
 
@@ -118,8 +131,6 @@ export const insumosPorProduccion = async (req, res) => {
     }
 }
 
-
-
 export const modificarInsumoDeProduccion = async (req, res) => {
     const {id} = req.params;
     const {produccion_id, insumo_id, cantidad_usada} = req.body;
@@ -132,20 +143,6 @@ export const modificarInsumoDeProduccion = async (req, res) => {
     }catch(error){
         console.log(error);
         res.status(500).json({error: "Error al modificar insumo de la produccion"});
-    }
-}
-
-export const eliminarInsumoDeProduccion = async (req, res) => {
-    const {id} = req.params;
-    try{
-        const resultado = await deleteProduccion_Insumo(id);
-        if(resultado.affectedRows == 1){
-            return res.json("Insumo eliminado de la producción.");
-        }
-        return res.json("No se pudo eliminar el insumo de la producción.");
-    }catch(error){
-        console.log(error);
-        res.status(500).json({error: "Error al eliminar insumo de la producción"});
     }
 }
 
