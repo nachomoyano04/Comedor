@@ -93,9 +93,9 @@ export const altaBajaProduccion = async (req, res) => {
         const resultado = await changeStateOfProduccion(num, id);
         if(resultado.affectedRows == 1){
             if(num == 1){
-                return res.json("Producción dada de alta.");
+                return res.json("Producción dada de baja.");
             }
-            return res.json("Producción dada de baja.");
+            return res.json("Producción dada de alta.");
         }
         return res.json("No se pudo cambiar el estado de la producción.");
     } catch (error) {
