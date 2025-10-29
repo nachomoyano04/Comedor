@@ -90,7 +90,7 @@ export const updateCostoPrimoTotalProduccion = async (cpt, id, connection) => {
 export const changeStateOfProduccion = async (estado, id) => {
     const query = "UPDATE produccion set estado = ? WHERE id = ?";
     try{
-        const resultado = await pool.query(query, [estado, id]);
+        const resultado = await pool.query(query, [estado == 1? 0 : 1, id]);
         return resultado[0];
     }catch(error){
         throw error;
