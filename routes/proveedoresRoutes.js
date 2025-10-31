@@ -12,6 +12,6 @@ router.patch("/alt/:id", activarProveedor);
 router.get("/contacto/:id", obtenerContactosPorProveedor);
 router.post("/contacto", nuevoContactoProveedor);
 router.put("/contacto/:id", editarContactoProveedor);
-router.delete("/contacto/:id", borrarContactoProveedor);
+router.delete("/contacto/:id_contacto", borrarContactoProveedor);
 
 export default router;

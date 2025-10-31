@@ -1,11 +1,11 @@
 import pool from "../config/database.js";
 
 //CREATE
-export const insertContactoProveedor = async (proveedor_id, nombre, telefono, email, es_principal) => {
-    const query = "INSERT INTO contacto_proveedor (proveedor_id, nombre, telefono, email, es_principal) VALUES (?, ?, ?, ?, ?)";
+export const insertContactoProveedor = async contacto_proveedor => {
+    const query = "INSERT INTO contacto_proveedor SET ?";
     try{
-        const resultado = await pool.query(query, [proveedor_id, nombre, telefono, email, es_principal]);
-        return resultado[0];
+        const resultado = await pool.query(query, [contacto_proveedor]);
+        return resultado[0].insertId;
     }catch(error){
         throw error;
     }
@@ -32,10 +32,10 @@ export const updateContactoProveedor = async (proveedor_id, nombre, telefono, em
 }
 
 //DELETE
-export const deleteContactoProveedor = async (id) => {
-    const query = "DELETE FROM contacto_proveedor WHERE id = ?";
+export const deleteContactoProveedor = async id_contacto => {
+    const query = "DELETE FROM contacto_proveedor WHERE id_contacto = ?";
     try{
-        const resultado = await pool.query(query, [id]);
+        const resultado = await pool.query(query, [id_contacto]);
         return resultado[0];
     }catch(error){
         throw error;

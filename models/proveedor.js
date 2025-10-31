@@ -23,7 +23,7 @@ export const getProveedores = async () => {
 }
 
 export const getProveedor = async id => {
-    const query = "SELECT * FROM proveedor WHERE id = ?"    
+    const query = "SELECT * FROM proveedor AS p LEFT JOIN contacto_proveedor AS cp ON p.id = cp.proveedor_id WHERE p.id = ?";    
     try {
         const resultado = await pool.query(query, [id]);
         return resultado[0];
