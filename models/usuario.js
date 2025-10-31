@@ -32,7 +32,11 @@ export const getUsuariosByRol = async (rol_id) => {
 }
 
 export const findUsuarioByDNI = async (dni) => {
-    const query = "SELECT * FROM usuario WHERE dni = ?";
+    const query = `SELECT u.id, u.nombre, u.apellido, u.dni, u.cuil, u.telefono, u.estado, ur.rol_id 
+                    FROM usuario AS u 
+                    LEFT JOIN usuario_rol AS ur ON u.id = ur.usuario_id 
+                    LEFT JOIN rol AS r ON ur.rol_id = r.id
+                    WHERE u.dni = ?`;
     try{
         const resultado = await pool.query(query, [dni]);
         return resultado[0];

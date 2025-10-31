@@ -1,5 +1,6 @@
 import { deleteProveedor, activateProveedor, getProveedores, getProveedor, insertProveedor, updateProveedor, getByCodigoCuitOrEmail } from "../models/proveedor.js";
 import { deleteContactoProveedor, getConProvByIdProveedor, insertContactoProveedor, updateContactoProveedor } from "../models/contacto_proveedor.js";
+import pool from "../config/database.js";
 
 export const nuevoProveedor = async (req, res) => {
     const proveedor = req.body;
@@ -93,10 +94,7 @@ export const nuevoContactoProveedor = async (req, res) => {
     const contacto_proveedor = req.body;
     try{
         const resultado = await insertContactoProveedor(contacto_proveedor);
-        if(resultado.affectedRows == 1){
-            return res.json("Contacto de proveedor registrado.");
-        }
-        return res.json("No se pudo registrar el contacto del proveedor.");
+        return res.json({id_contacto: resultado});
     }catch(error){
         console.log(error);
         res.status(500).json({error: "Error al agregar nuevo contacto de proveedor", message: error.sqlMessage});       
@@ -130,9 +128,9 @@ export const obtenerContactosPorProveedor = async (req, res) => {
 }
 
 export const borrarContactoProveedor = async (req, res) => {
-    const {id} = req.params;
+    const {id_contacto} = req.params;
     try{
-        const resultado = await deleteContactoProveedor(id);
+        const resultado = await deleteContactoProveedor(id_contacto);
         if(resultado.affectedRows == 1){
             return res.json("Contacto de proveedor borrado.");
         }
