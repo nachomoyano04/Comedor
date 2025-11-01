@@ -1,11 +1,12 @@
 import pool from "../config/database.js";
 
 //CREATE
-export const insertProveedor = async (proveedor) => {
+export const insertProveedor = async proveedor => {
     proveedor.estado = 1;
+    const {contactos, tipo, ...restProveedor} = proveedor;
     const query = "INSERT INTO proveedor SET ?";
     try{
-        const resultado = await pool.query(query, proveedor);
+        const resultado = await pool.query(query, restProveedor);
         return resultado[0];
     }catch(error){
         throw error;
