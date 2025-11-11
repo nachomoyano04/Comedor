@@ -41,7 +41,8 @@ export const getProduccionById = async (id, connection) => {
                     JOIN produccion_insumo AS pi ON pi.produccion_id = p.id 
                     JOIN insumo AS i ON pi.insumo_id = i.id 
                     JOIN unidad_de_medida AS udm ON i.id_unidad_de_medida = udm.id
-                    WHERE p.id = ?;`
+                    WHERE p.id = ?
+                    ORDER BY pi.insumo_id ASC;`
     try {
         const resultado = await connection.query(query, [id]);
         return resultado[0];
