@@ -28,7 +28,7 @@ export const nuevaProduccion = async (req, res) => {
     }catch(error){
         await connection.rollback();
         console.log(error);
-        res.status(500).json({error: "Error al registrar nueva producción."});
+        return res.status(500).json({error: "Error al registrar nueva producción."});
     }finally{
         connection.release();
     }
@@ -57,7 +57,7 @@ export const editarProduccion = async (req, res) => {
     }catch(error){
         await connection.rollback();
         console.log(error);
-        res.status(500).json({error: "Error al editar produccion"});
+        return res.status(500).json({error: "Error al editar produccion"});
     }finally{
         connection.release();
     }
@@ -69,7 +69,7 @@ export const obtenerProducciones = async (req, res) => {
         return res.json(resultado);
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al obtener producciones"});
+        return res.status(500).json({error: "Error al obtener producciones"});
     }
 }
 
@@ -81,7 +81,7 @@ export const obtenerProduccionPorId = async (req, res) => {
         return res.json(resultado);        
     } catch (error) {
         console.log(error);
-        res.status(500).json({error: "Error al obtener la produccion"});
+        return res.status(500).json({error: "Error al obtener la produccion"});
     } finally {
         connection.release();
     }
@@ -99,7 +99,8 @@ export const altaBajaProduccion = async (req, res) => {
         }
         return res.json("No se pudo cambiar el estado de la producción.");
     } catch (error) {
-        
+        console.log(error);
+        return res.status(500).json({error: "Error al cambiar de estado la produccion"});
     }
 }
 

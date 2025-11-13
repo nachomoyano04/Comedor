@@ -20,11 +20,11 @@ export const crearPrecio = async (req, res) => {
             return res.json("Precio registrado.");
         }
         await connection.rollback()
-        return res.status(500).json("No se pudo registrar el precio.");
+        return res.status(500).json({error: "No se pudo registrar el precio."});
     }catch(error){
         await connection.rollback()
         console.log(error); 
-        res.status(500).json({error: "Error al crear precio"});
+        return res.status(500).json({error: "Error al crear precio"});
     }finally{
         connection.release();
     }
@@ -41,7 +41,7 @@ export const editarPrecio = async (req, res) => {
         return res.json("No se pudo editar el precio");
     }catch(error){
         console.log(error); 
-        res.status(500).json({error: "Error al editar precio"});
+        return res.status(500).json({error: "Error al editar precio"});
     }
 }
 
@@ -51,7 +51,7 @@ export const obtenerPrecios = async (req, res) => {
         return res.json(resultado);
     } catch (error) {
         console.log(error);
-        res.status(500).json({error: "Error al obtener todos los precios"});
+        return res.status(500).json({error: "Error al obtener todos los precios"});
     }
 }
 
@@ -63,7 +63,7 @@ export const obtenerPrecioPorInsumo = async (req, res) => {
         return res.json(resultado);
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al obtener precio"});
+        return res.status(500).json({error: "Error al obtener precio"});
     }finally{
         connection.release();
     }
@@ -93,7 +93,7 @@ export const borrarPrecio = async (req, res) => {
         return res.json("No se pudo borrar el precio");
     }catch(error){
         await connection.rollback();
-        res.status(500).json({error: "Error al borrar el precio"});
+        return res.status(500).json({error: "Error al borrar el precio"});
     } finally{
         connection.release();
     }
