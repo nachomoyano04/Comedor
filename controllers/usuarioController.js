@@ -9,7 +9,6 @@ export const nuevoUsuario = async (req, res) => {
     const connection = await pool.getConnection();
     try{
         await connection.beginTransaction();
-
         //Chequeamos de que no haya otro usuario con ese dni o cuil...
         const hayOtro = await findByDniOrCuil(dni, cuil);
         if(hayOtro.length > 0){
@@ -32,7 +31,7 @@ export const nuevoUsuario = async (req, res) => {
     }catch(error){
         await connection.rollback();
         console.log(error);
-        res.status(500).json({error: "Error al crear nuevo usuario"});
+        return res.status(500).json({error: "Error al crear nuevo usuario"});
     }finally{
         connection.release();
     }
@@ -64,7 +63,7 @@ export const editarUsuario = async (req, res) => {
     }catch(error){
         await connection.rollback();
         console.log(error);
-        res.status(500).json({error: "Error al editar usuario"});
+        return res.status(500).json({error: "Error al editar usuario"});
     }finally{
         connection.release()
     }
@@ -76,7 +75,7 @@ export const obtenerUsuarios = async (req, res) => {
         return res.json(resultado);
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al obtener usuarios"});
+        return res.status(500).json({error: "Error al obtener usuarios"});
     }
 }
 
@@ -90,7 +89,7 @@ export const borrarUsuario = async (req, res) => {
         return res.json("No se pudo dar de baja el usuario.");
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al borrar usuario"});
+        return res.status(500).json({error: "Error al borrar usuario"});
     }
 }
 
@@ -104,7 +103,7 @@ export const activarUsuario = async (req, res) => {
         return res.json("No se pudo dar de alta el usuario.");
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al activar usuario"});
+        return res.status(500).json({error: "Error al activar usuario"});
     }
 }
 
@@ -118,7 +117,7 @@ export const nuevoRolAUsuario = async (req, res) => {
         return res.json("No se pudo asignar el rol.");
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al asignar rol al usuario"});
+        return res.status(500).json({error: "Error al asignar rol al usuario"});
     }
 }
 
@@ -129,7 +128,7 @@ export const obtenerUsuariosPorRol = async (req, res) => {
         return res.json(resultado);
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al obtener usuarios"});
+        return res.status(500).json({error: "Error al obtener usuarios"});
     }
 }
 
@@ -140,7 +139,7 @@ export const buscarUsuarioPorDni = async (req, res) => {
         return res.json(resultado);
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al obtener usuario"});
+        return res.status(500).json({error: "Error al obtener usuario"});
     }
 }
 
@@ -154,7 +153,7 @@ export const cambiarRol = async (req, res) => {
         return res.json("No se pudo cambiar el rol del usuario");
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al cambiar rol de usuario"});
+        return res.status(500).json({error: "Error al cambiar rol de usuario"});
     }
 }
 
@@ -170,7 +169,7 @@ export const cambiarPassword = async (req, res) => {
         return res.json("No se pudo cambiar la password");
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al actualizar password"});
+        return res.status(500).json({error: "Error al actualizar password"});
     }
 }
 
@@ -181,6 +180,6 @@ export const loginUsuario = async (req, res) => {
         return res.json(tokens);
     }catch(error) {
         console.log(error);
-        res.status(500).json({error: "Error al loguearse"});
+        return res.status(500).json({error: "Error al loguearse"});
     }
 }

@@ -19,7 +19,7 @@ export const nuevaReceta = async (req, res) => {
     }catch(error) {
         await connection.rollback();
         console.log(error);
-        res.status(500).json({error: "Error al registrar nueva receta"});
+        return res.status(500).json({error: "Error al registrar nueva receta"});
     }finally{
         connection.release();
     }
@@ -31,7 +31,7 @@ export const obtenerRecetas = async (req, res) => {
         return res.json(resultado);
     }catch(error) {
         console.log(error);
-        res.status(500).json({error: "Error al obtener recetas"});
+        return res.status(500).json({error: "Error al obtener recetas"});
     }
 }
 
@@ -42,7 +42,7 @@ export const obtenerRecetaPorId = async (req, res) => {
         return res.json(resultado);
     } catch (error) {
         console.log(error);
-        res.status(500).json({error: "Error al obtener receta"});
+        return res.status(500).json({error: "Error al obtener receta"});
     }
 }
 
@@ -61,7 +61,7 @@ export const editarReceta = async (req, res) => {
     }catch(error) {
         await connection.rollback();
         console.log(error);
-        res.status(500).json({error: "Error al editar receta"});
+        return res.status(500).json({error: "Error al editar receta"});
     }finally{
         connection.release();
     }
@@ -77,7 +77,7 @@ export const darDeBajaReceta = async (req, res) => {
         return res.json("No se pudo dar de baja la receta");
     }catch(error) {
         console.log(error);
-        res.status(500).json({error: "Error al dar de baja la receta"});
+        return res.status(500).json({error: "Error al dar de baja la receta"});
     }
 }
 
@@ -91,7 +91,7 @@ export const activarReceta = async (req, res) => {
         return res.json("No se pudo dar de alta la receta");
     }catch(error) {
         console.log(error);
-        res.status(500).json({error: "Error al dar de alta la receta"});
+        return res.status(500).json({error: "Error al dar de alta la receta"});
     }
 }
 
@@ -105,7 +105,7 @@ export const agregarInsumoAReceta = async (req, res) => {
         return res.json("No se pudo agregar el insumo a la receta");
     }catch(error) {
         console.log(error);
-        res.status(500).json({error: "Error al agregar insumo a receta"});
+        return res.status(500).json({error: "Error al agregar insumo a receta"});
     }
 }
 
@@ -120,7 +120,7 @@ export const modificarInsumoDeReceta = async (req, res) => {
         return res.json("No se pudo modificar el insumo de la receta");
     }catch(error) {
         console.log(error); 
-        res.status(500).json({error: "Error al modificar insumo de receta"});
+        return res.status(500).json({error: "Error al modificar insumo de receta"});
     }
 }
 export const borrarInsumoDeReceta = async (req, res) => {
@@ -133,6 +133,6 @@ export const borrarInsumoDeReceta = async (req, res) => {
         return res.json("No se pudo borrar el insumo de la receta");
     }catch(error) {
         console.log(error);
-        res.status(500).json({error: "Error al borrar insumo de receta"});
+        return res.status(500).json({error: "Error al borrar insumo de receta"});
     }
 }

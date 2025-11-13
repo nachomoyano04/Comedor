@@ -7,7 +7,7 @@ export const listarInsumos = async (req, res) => {
         return res.json(insumos);
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al listar los insumos", mensaje: error.sqlMessage});
+        return res.status(500).json({error: "Error al listar los insumos", mensaje: error.sqlMessage});
     }
 }
 export const listarInsumosParaReceta = async (req, res) => {
@@ -16,7 +16,7 @@ export const listarInsumosParaReceta = async (req, res) => {
         return res.json(insumos);
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al listar los insumos", mensaje: error.sqlMessage});
+        return res.status(500).json({error: "Error al listar los insumos", mensaje: error.sqlMessage});
     }
 }
 
@@ -28,7 +28,7 @@ export const obtenerInsumo = async (req, res) => {
         return res.json(insumo);
     } catch (error) {
         console.log(error);
-        res.status(500).json({error: "Error al obtener insumo", mensaje: error.sqlMessage});   
+        return res.status(500).json({error: "Error al obtener insumo", mensaje: error.sqlMessage});   
     } finally {
         connection.release();
     }
@@ -48,7 +48,7 @@ export const nuevoInsumo = async (req, res) => {
         return res.json("No se pudo registrar el insumo.");
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al crear insumo", mensaje: error.sqlMessage});    
+        return res.status(500).json({error: "Error al crear insumo", mensaje: error.sqlMessage});    
     }
 }
 
@@ -64,10 +64,10 @@ export const editarInsumo = async (req, res) => {
         if(resultado.affectedRows > 0){
             return res.json("Insumo editado");
         }
-        res.json("No se pudo editar el insumo");
+        return res.json("No se pudo editar el insumo");
     }catch(error){
         console.log(error);
-        res.status(500).json({error: "Error al editar insumo", mensaje: error.sqlMessage});
+        return res.status(500).json({error: "Error al editar insumo", mensaje: error.sqlMessage});
     }
 }
 
@@ -81,7 +81,7 @@ export const borrarInsumo = async (req, res) => {
         return res.json("No se pudo borrar el insumo");
     } catch (error) {
         console.log(error);
-        res.status(500).json({error: "Error al eliminar insumo", mensaje: error.sqlMessage});
+        return res.status(500).json({error: "Error al eliminar insumo", mensaje: error.sqlMessage});
     }
 }
 
@@ -95,6 +95,6 @@ export const activarInsumo = async (req, res) => {
         return res.json("No se pudo activar el insumo");
     } catch (error) {
         console.log(error);
-        res.status(500).json({error: "Error al activar insumo", mensaje: error.sqlMessage});
+        return res.status(500).json({error: "Error al activar insumo", mensaje: error.sqlMessage});
     }
 }

@@ -3,8 +3,6 @@ import dayjs from "dayjs";
 
 //CREATE
 export const insertPrecio = async (precio, connection) => {
-    const fecha_actual = dayjs().format("YYYY-MM-DD HH:mm:ss");
-    precio.fecha_desde = fecha_actual; 
     const query = "INSERT INTO precio SET ?";
     try{
         const resultado = await connection.query(query, precio);
