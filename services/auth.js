@@ -1,6 +1,6 @@
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
-import { findUsuarioByDNI, insertUsuario } from "../models/usuario.js";
+import { findUsuarioByDNI, getPasswordByDNI, insertUsuario } from "../models/usuario.js";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "comedor_secret_access_123";
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "comedor_secret_refresh_123";
@@ -59,7 +59,8 @@ export const login = async (dni, password) => {
     if(usuario.length == 0){
         return ({error: "Usuario no encontrado"});
     }
-    const passValida = await verificarPassword(usuario[0].password, password);
+    const passwordUser = await getPasswordByDNI(dni);
+    const passValida = await verificarPassword(passwordUser.password, password);
     if(!passValida){
         return ({error: "Password incorrecta"});
     }

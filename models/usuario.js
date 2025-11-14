@@ -31,6 +31,16 @@ export const getUsuariosByRol = async (rol_id) => {
     }
 }
 
+export const getPasswordByDNI = async dni => {
+    const query= "SELECT password FROM usuario WHERE dni = ?";
+    try {
+        const resultado = await pool.query(query, [dni]);
+        return resultado[0][0];
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const findUsuarioByDNI = async (dni) => {
     const query = `SELECT u.id, u.nombre, u.apellido, u.dni, u.cuil, u.telefono, u.estado, ur.rol_id 
                     FROM usuario AS u 
