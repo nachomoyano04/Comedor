@@ -177,6 +177,9 @@ export const loginUsuario = async (req, res) => {
     const {dni, password} = req.body;
     try {
         const tokens = await login(dni, password);
+        if("error" in tokens){
+            return res.status(401).json("dni y/o password incorrecto");
+        }
         return res.json(tokens);
     }catch(error) {
         console.log(error);
