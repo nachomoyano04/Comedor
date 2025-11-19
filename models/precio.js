@@ -31,7 +31,7 @@ export const getPrecios = async () => {
 }
 
 export const getPrecioByInsumo = async (id, connection) => {
-    const query = `SELECT p.id, p.insumo_id, p.proveedor_id, p.precio_unitario, p.fecha_desde, p.fecha_hasta, p.cantidad, i.producto, prov.razon_social
+    const query = `SELECT p.id, p.insumo_id, p.proveedor_id, p.precio_unitario, p.fecha_desde, p.fecha_hasta, p.fecha_vencimiento, p.cantidad, i.producto, prov.razon_social
                     FROM precio AS p
                     JOIN insumo AS i ON p.insumo_id = i.id
                     JOIN proveedor AS prov ON p.proveedor_id = prov.id
@@ -72,15 +72,6 @@ export const getPrecioById = async (id, connection) => {
 }
 
 //UPDATE
-export const updatePrecio = async (ins_id, prov_id, precio_unit, f_desde, f_hasta, id) => {
-    const query = "UPDATE precio SET insumo_id = ?, proveedor_id = ?, precio_unitario = ?, fecha_desde = ?, fecha_hasta = ? WHERE id = ?";
-    try{
-        const resultado = await pool.query(query, [ins_id, prov_id, precio_unit, f_desde, f_hasta, id]);
-        return resultado[0];
-    }catch(error){
-        throw error;
-    }
-}
 
 export const updateFechaHasta = async (id, connection) => {
     const fecha_actual = dayjs().format("YYYY-MM-DD HH:mm:ss");
