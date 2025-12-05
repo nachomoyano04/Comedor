@@ -48,10 +48,10 @@ export const obtenerRecetaPorId = async (req, res) => {
 
 export const editarReceta = async (req, res) => {
     const {id} = req.params;
-    const {nombre, descripcion, insumo} = req.body;
+    const {nombre, descripcion, cuantos_comen, insumo} = req.body;
     const connection = await pool.getConnection();
     try{ 
-        await updateReceta(nombre, descripcion, id); //Le cambiamos el nombre y la descripcion...
+        await updateReceta(nombre, descripcion, cuantos_comen, id); //Le cambiamos el nombre, descripcion y cuantos_comen...
         await deleteInsumosDeReceta(id); //Eliminamos los insumos que tenia la receta 
         for(const i of insumo){ //Agregamos todos los insumos...
             await insertReceta_Insumo({receta_id: id, insumo_id: i.value, cantidad: i.cantidad}); 

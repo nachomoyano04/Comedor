@@ -16,7 +16,7 @@ export const insertReceta = async receta => {
 
 //READ
 export const getRecetas = async id => {
-    const query = "SELECT r.id, r.estado, r.nombre, r.descripcion, ri.cantidad, ri.insumo_id, i.producto, udm.simbolo FROM receta AS r JOIN receta_insumo AS ri ON r.id = ri.receta_id JOIN insumo AS i ON i.id = ri.insumo_id JOIN unidad_de_medida AS udm ON udm.id = i.id_unidad_de_medida";
+    const query = "SELECT r.id, r.estado, r.nombre, r.cuantos_comen, r.descripcion, ri.cantidad, ri.insumo_id, i.producto, udm.simbolo FROM receta AS r JOIN receta_insumo AS ri ON r.id = ri.receta_id JOIN insumo AS i ON i.id = ri.insumo_id JOIN unidad_de_medida AS udm ON udm.id = i.id_unidad_de_medida";
     try{
         const resultado = await pool.query(query);
         return resultado[0];
@@ -26,7 +26,7 @@ export const getRecetas = async id => {
 }
 
 export const getRecetaById = async id => {
-    const query = "SELECT r.id, r.estado, r.nombre, r.descripcion, ri.cantidad, ri.insumo_id, i.producto, udm.simbolo FROM receta AS r JOIN receta_insumo AS ri ON r.id = ri.receta_id JOIN insumo AS i ON i.id = ri.insumo_id JOIN unidad_de_medida AS udm ON udm.id = i.id_unidad_de_medida WHERE r.id = ?";
+    const query = "SELECT r.id, r.estado, r.nombre, r.cuantos_comen, r.descripcion, ri.cantidad, ri.insumo_id, i.producto, udm.simbolo FROM receta AS r JOIN receta_insumo AS ri ON r.id = ri.receta_id JOIN insumo AS i ON i.id = ri.insumo_id JOIN unidad_de_medida AS udm ON udm.id = i.id_unidad_de_medida WHERE r.id = ?";
     try{
         const resultado = await pool.query(query, [id]);
         return resultado[0];
@@ -36,10 +36,10 @@ export const getRecetaById = async id => {
 }
 
 //UPDATE
-export const updateReceta = async (nombre, descripcion, id) => {
-    const query = "UPDATE receta SET nombre = ?, descripcion = ? WHERE id = ?";
+export const updateReceta = async (nombre, descripcion, cuantos_comen, id) => {
+    const query = "UPDATE receta SET nombre = ?, descripcion = ?, cuantos_comen = ? WHERE id = ?";
     try{
-        const resultado = await pool.query(query, [nombre, descripcion, id]);
+        const resultado = await pool.query(query, [nombre, descripcion, cuantos_comen, id]);
         return resultado[0];
     }catch(error){
         throw error;
