@@ -1,7 +1,12 @@
 import express from "express";
 import { activarUsuario, borrarUsuario, buscarUsuarioPorDni, cambiarPassword, cambiarRol, editarUsuario, loginUsuario, nuevoRolAUsuario, nuevoUsuario, obtenerUsuarios, obtenerUsuariosPorRol } from "../controllers/usuarioController.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+
+router.post("/login", loginUsuario)
+
+router.use(authMiddleware); //Middleware de autenticacion con jwt
 
 router.get("/", obtenerUsuarios);
 router.post("/", nuevoUsuario);
@@ -13,6 +18,5 @@ router.get("/dni/:dni", buscarUsuarioPorDni);
 router.post("/rol", nuevoRolAUsuario);
 router.get("/rol/:rol_id", obtenerUsuariosPorRol);
 router.patch("/rol/:rol_id/cambiar/:id", cambiarRol); // <- ver si realmente nos sirve. Como puede ser mas de un rol...
-router.post("/login", loginUsuario)
 
 export default router;

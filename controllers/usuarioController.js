@@ -180,7 +180,8 @@ export const loginUsuario = async (req, res) => {
         if("error" in tokens){
             return res.status(401).json("dni y/o password incorrecto");
         }
-        return res.json(tokens);
+        const {access_token, refresh_token} = tokens;
+        return res.json({access_token, refresh_token, mensaje: `Bienvenido ${tokens.nombre?tokens.nombre:""}`});
     }catch(error) {
         console.log(error);
         return res.status(500).json({error: "Error al loguearse"});
