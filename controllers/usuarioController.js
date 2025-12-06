@@ -1,5 +1,5 @@
 import { changeStateUser, findByDniOrCuil, findUsuarioByDNI, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario.js";
-import { hashearPassword, login } from "../services/auth.js";
+import { generateAccessToken, hashearPassword, login, validateRefreshToken } from "../services/auth.js";
 import { deleteRolesFromUser, getRolesByUser, insertUsuario_Rol } from "../models/roles.js";
 import pool from "../config/database.js";
 
@@ -180,10 +180,45 @@ export const loginUsuario = async (req, res) => {
         if("error" in tokens){
             return res.status(401).json("dni y/o password incorrecto");
         }
-        const {access_token, refresh_token} = tokens;
-        return res.json({access_token, refresh_token, mensaje: `Bienvenido ${tokens.nombre?tokens.nombre:""}`});
+        const {access_token, refresh_token, nombre} = tokens;
+        //Guardamos el token para las peticiones 401 en una cookie segura en el backend...
+        res.cookie("refresh_token", refresh_token, {
+            httpOnly: true, secure: true, sameSite: "strict", path: "/usuario/auth/refresh", maxAge: 1000 * 60 * 60 * 24 * 7
+        })
+        return res.json({access_token, mensaje: `Bienvenido ${nombre? nombre:""}`});
     }catch(error) {
         console.log(error);
         return res.status(500).json({error: "Error al loguearse"});
     }
+}
+
+export const renovar_token = async(req, res) => {
+    try {
+        const refreshToken = req.cookies.refresh_token;
+
+        if(!refreshToken){
+            return res.status(401).json({error: "No hay refresh token"});
+        }
+
+        const payload = validateRefreshToken(refreshToken);
+        if(!payload){
+            return res.status(401).json({error: "Refresh token inválido"});
+        }
+
+        const usuario = await findUsuarioByDNI(payload.dni);
+        if(usuario.length == 0){
+            return res.status(401).json({error: "Usuario no encontrado"});
+        }
+
+        const nuevo_access_token = generateAccessToken(usuario[0]);
+        return res.json({access_token: nuevo_access_token});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Error al renovar token" });
+    }   
+}
+
+export const eliminar_token_refresh = (req, res) => {
+    res.clearCookie("refresh_token", { path: "/usuario/auth/refresh" });
+    return res.status(204);
 }

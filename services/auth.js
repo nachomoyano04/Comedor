@@ -37,7 +37,17 @@ export const generateAccessToken = usuario => {
 
 //Renovamos token
 export const refreshAccessToken = usuario => {
-    return jwt.sign({ id: usuario.id, nombre: usuario.nombre, apellido: usuario.apellido, dni: usuario.dni, rol_id: usuario.rol_id, nombre_rol: usuario.nombre_rol }, REFRESH_TOKEN_SECRET, { expiresIn: '7d' });};
+    return jwt.sign({ id: usuario.id, nombre: usuario.nombre, apellido: usuario.apellido, dni: usuario.dni, rol_id: usuario.rol_id, nombre_rol: usuario.nombre_rol }, REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+};
+
+//Verificar refresh_token
+export const validateRefreshToken = token => {
+    try {
+        return jwt.verify(token, REFRESH_TOKEN_SECRET);
+    } catch (error) {
+        return null;
+    }
+} 
 
 //Creamos el usuario
 export const registerUser = async (rol_id, nombre, apellido, dni, cuil, telefono, password) => {
