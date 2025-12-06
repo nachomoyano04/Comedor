@@ -1,7 +1,10 @@
 import express from "express";
 import { borrarContactoProveedor, obtenerProveedor, borrarProveedor, activarProveedor, editarContactoProveedor, editarProveedor, nuevoContactoProveedor, nuevoProveedor, obtenerContactosPorProveedor, obtenerProveedores } from "../controllers/proveedoresController.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+
+router.use(authMiddleware); //Middleware de autenticacion con jwt
 
 router.get("/", obtenerProveedores);
 router.get("/:id", obtenerProveedor);

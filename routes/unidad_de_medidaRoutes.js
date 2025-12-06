@@ -1,6 +1,9 @@
 import express from "express";
 import {listarUDM, borrarUDM, editarUDM, nuevoUDM} from "../controllers/unidad_de_medidaController.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 const router = express.Router();
+
+router.use(authMiddleware); //Middleware de autenticacion con jwt
 
 router.get("/", listarUDM);
 router.post("/", nuevoUDM);

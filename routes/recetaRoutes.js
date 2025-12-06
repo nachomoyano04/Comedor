@@ -1,7 +1,10 @@
 import express from "express";
 import { activarReceta, agregarInsumoAReceta, borrarInsumoDeReceta, darDeBajaReceta, editarReceta, modificarInsumoDeReceta, nuevaReceta, obtenerRecetaPorId, obtenerRecetas } from "../controllers/recetaController.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+
+router.use(authMiddleware); //Middleware de autenticacion con jwt
 
 router.get("/", obtenerRecetas);
 router.get("/:id", obtenerRecetaPorId);
