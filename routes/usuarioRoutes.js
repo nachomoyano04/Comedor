@@ -1,5 +1,5 @@
 import express from "express";
-import { activarUsuario, borrarUsuario, buscarUsuarioPorDni, cambiarPassword, cambiarRol, editarUsuario, loginUsuario, nuevoRolAUsuario, nuevoUsuario, obtenerUsuarios, obtenerUsuariosPorRol } from "../controllers/usuarioController.js";
+import { activarUsuario, borrarUsuario, buscarUsuarioPorDni, cambiarPassword, cambiarRol, editarUsuario, eliminar_token_refresh, loginUsuario, nuevoRolAUsuario, nuevoUsuario, obtenerUsuarios, obtenerUsuariosPorRol, renovar_token } from "../controllers/usuarioController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -8,6 +8,8 @@ router.post("/login", loginUsuario)
 
 router.use(authMiddleware); //Middleware de autenticacion con jwt
 
+router.post("/auth/refresh", renovar_token)
+router.post("/auth/logout", eliminar_token_refresh)
 router.get("/", obtenerUsuarios);
 router.post("/", nuevoUsuario);
 router.put("/:id", editarUsuario);
