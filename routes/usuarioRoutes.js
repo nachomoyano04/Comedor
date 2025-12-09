@@ -5,11 +5,11 @@ import { authMiddleware } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.post("/login", loginUsuario)
+router.post("/auth/refresh", renovar_token)
+router.post("/auth/logout", eliminar_token_refresh)
 
 router.use(authMiddleware); //Middleware de autenticacion con jwt
 
-router.post("/auth/refresh", renovar_token)
-router.post("/auth/logout", eliminar_token_refresh)
 router.get("/", obtenerUsuarios);
 router.post("/", nuevoUsuario);
 router.put("/:id", editarUsuario);

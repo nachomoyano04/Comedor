@@ -10,15 +10,31 @@ import rolesRouter from "./routes/rolesRoutes.js";
 import unidad_de_medidaRouter from "./routes/unidad_de_medidaRoutes.js";
 import usuarioRouter from "./routes/usuarioRoutes.js";
 import cors from "cors";
+import cookieParser from "cookie-parser"
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-//Middleware
+//CORS
+const corsOptions = {
+    origin: `http://localhost:5173`,
+    credentials: true
+}
+
+app.use(cors(corsOptions));
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Credentials", "true");
+    next();
+});
+
+//JSON parser
 app.use(express.json());
-app.use(cors());
+
+//Cookie parser
+app.use(cookieParser());
 
 //Rutas
 app.use("/insumos", insumosRouter);

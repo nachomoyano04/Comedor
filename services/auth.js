@@ -32,7 +32,7 @@ export const verificarPassword = async (hash, pass) => {
 
 //Generar token
 export const generateAccessToken = usuario => {
-    return jwt.sign({ id: usuario.id, nombre: usuario.nombre, apellido: usuario.apellido, dni: usuario.dni, rol_id: usuario.rol_id, nombre_rol: usuario.nombre_rol }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+    return jwt.sign({ id: usuario.id, nombre: usuario.nombre, apellido: usuario.apellido, dni: usuario.dni, rol_id: usuario.rol_id, nombre_rol: usuario.nombre_rol }, ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
 };
 
 //Renovamos token
