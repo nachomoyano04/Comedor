@@ -65,8 +65,6 @@ export const editarProduccion = async (req, res) => {
 
 export const obtenerProducciones = async (req, res) => {
     try{
-        console.log(req.user);
-        console.log(`Desde obtener producciones mostrando el payload: ${req.user.dni}`);
         const resultado = await getProducciones();
         return res.json(resultado);
     }catch(error){
