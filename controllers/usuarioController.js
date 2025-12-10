@@ -184,11 +184,10 @@ export const loginUsuario = async (req, res) => {
         //Guardamos el token para las peticiones 401 en una cookie segura en el backend...
         res.cookie("refresh_token", refresh_token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
+            secure: false, //EN PRODUCCION -> true
+            sameSite: "strict",
             path: "/usuario/auth",
-            domain: "localhost",
-            maxAge: 1000 * 60 * 60 * 24 * 7
+            maxAge: 7 * 24 * 60 * 60 * 1000 //En 7 días
         })
         return res.json({ access_token, mensaje: `Bienvenido ${nombre ? nombre : ""}` });
     } catch (error) {
@@ -223,13 +222,11 @@ export const renovar_token = async (req, res) => {
 }
 
 export const eliminar_token_refresh = (req, res) => {
-    console.log("eliminando");
     res.clearCookie("refresh_token", {
         httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        path: "/usuario/auth",
-        domain: "localhost",
-    });
-    return res.sendStatus(204);
+        secure: false, //EN PRODUCCION -> true
+        sameSite: "strict",
+        path: "/usuario/auth"
+    })
+    res.sendStatus(204);
 }
