@@ -2,8 +2,8 @@ import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { findUsuarioByDNI, getPasswordByDNI, insertUsuario } from "../models/usuario.js";
 
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "comedor_secret_access_123";
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "comedor_secret_refresh_123";
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "comedor_secret_access_123456";
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "comedor_secret_refresh_654321";
 
 //Hasheo de password
 export const hashearPassword = async pass => {
