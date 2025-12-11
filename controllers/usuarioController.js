@@ -1,5 +1,5 @@
 import { changeStateUser, findByDniOrCuil, findUsuarioByDNI, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario.js";
-import { generateAccessToken, hashearPassword, login, validateRefreshToken } from "../services/auth.js";
+import { generateAccessToken, hashearPassword, login, validateRefreshToken, verificarPassword } from "../services/auth.js";
 import { deleteRolesFromUser, getRolesByUser, insertUsuario_Rol } from "../models/roles.js";
 import pool from "../config/database.js";
 
@@ -54,6 +54,12 @@ export const editarUsuario = async (req, res) => {
             for (const r of rol) {
                 await insertUsuario_Rol({ usuario_id: id, rol_id: r }, connection);
             }
+        }
+        //Logica de que si cambia el dni y la password es su dni. Que tambien cambie la password...
+        const dniIgualAPassword = await verificarPassword(hayOtro[0].password, hayOtro[0].dni);
+        if(dniIgualAPassword){
+            const pass = await hashearPassword(dni);
+            await updatePassword(pass, id);
         }
         await connection.commit();
         if (resultado.affectedRows > 0) {
