@@ -21,6 +21,27 @@ export const getUsuarios = async () => {
         throw(error);
     }
 }
+
+export const getUserById = async id => {
+    const query = "SELECT nombre, apellido, dni, cuil, telefono, correo, estado FROM usuario WHERE id = ?";
+    try{
+        const resultado = await pool.query(query, [id]);
+        return resultado[0][0];
+    }catch(error){
+        throw(error);
+    }
+}
+
+export const getPassUserById = async id => {
+    const query = "SELECT password FROM usuario WHERE id = ?";
+    try {
+        const resultado = await pool.query(query, [id]);
+        return resultado[0][0];
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const getUsuariosByRol = async (rol_id) => {
     const query = "SELECT * FROM usuario_rol JOIN usuario WHERE rol_id = ?";
     try{
@@ -42,7 +63,7 @@ export const getPasswordByDNI = async dni => {
 }
 
 export const findUsuarioByDNI = async (dni) => {
-    const query = `SELECT u.id, u.nombre, u.apellido, u.dni, u.cuil, u.telefono, u.estado, ur.rol_id, r.nombre_rol 
+    const query = `SELECT u.id, u.nombre, u.apellido, u.dni, u.cuil, u.correo, u.telefono, u.estado, ur.rol_id, r.nombre_rol 
                     FROM usuario AS u 
                     LEFT JOIN usuario_rol AS ur ON u.id = ur.usuario_id 
                     LEFT JOIN rol AS r ON ur.rol_id = r.id
@@ -63,7 +84,7 @@ export const findByDniOrCuil = async (dni, cuil, id) => {
             return resultado[0];
         } 
         // para editar
-        const query = "SELECT * FROM usuario WHERE (dni = ? or cuil = ?) AND id != 1";
+        const query = "SELECT * FROM usuario WHERE (dni = ? or cuil = ?) AND id != ?";
         const resultado = await pool.query(query, [dni, cuil, id]);
         return resultado[0];
     } catch (error) {
@@ -72,10 +93,10 @@ export const findByDniOrCuil = async (dni, cuil, id) => {
 }
 
 //UPDATE
-export const updateUsuario = async (nombre, apellido, dni, cuil, telefono, id, connection) => {
-    const query = "UPDATE usuario SET nombre = ?, apellido = ?, dni = ?, cuil = ?, telefono = ? WHERE id = ?";
+export const updateUsuario = async (nombre, apellido, dni, cuil, correo, telefono, id, connection) => {
+    const query = "UPDATE usuario SET nombre = ?, apellido = ?, dni = ?, cuil = ?, correo = ?, telefono = ? WHERE id = ?";
     try{
-        const resultado = await connection.query(query, [nombre, apellido, dni, cuil, telefono, id]);
+        const resultado = await connection.query(query, [nombre, apellido, dni, cuil, correo, telefono, id]);
         return resultado[0];
     }catch(error){
         throw(error);

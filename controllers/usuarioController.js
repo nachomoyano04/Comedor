@@ -1,11 +1,11 @@
-import { changeStateUser, findByDniOrCuil, findUsuarioByDNI, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario.js";
+import { changeStateUser, findByDniOrCuil, findUsuarioByDNI, getPassUserById, getUserById, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario.js";
 import { generateAccessToken, hashearPassword, login, validateRefreshToken, verificarPassword } from "../services/auth.js";
 import { deleteRolesFromUser, getRolesByUser, insertUsuario_Rol } from "../models/roles.js";
 import pool from "../config/database.js";
 
 export const nuevoUsuario = async (req, res) => {
-    const { nombre, apellido, dni, cuil, telefono, rol } = req.body;
-    const usuario = { nombre, apellido, dni, cuil, telefono };
+    const { nombre, apellido, dni, cuil, telefono, correo, rol } = req.body;
+    const usuario = { nombre, apellido, dni, cuil, telefono, correo };
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
@@ -39,7 +39,8 @@ export const nuevoUsuario = async (req, res) => {
 
 export const editarUsuario = async (req, res) => {
     const { id } = req.params
-    const { nombre, apellido, dni, cuil, telefono, rol } = req.body;
+    const { nombre, apellido, dni, cuil, correo, telefono, rol } = req.body;
+    console.log(req.body);
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
@@ -48,7 +49,8 @@ export const editarUsuario = async (req, res) => {
         if (hayOtro.length > 0 && hayOtro[0].id != id) {
             return res.status(500).json("Dni o cuil ya existentes");
         }
-        const resultado = await updateUsuario(nombre, apellido, dni, cuil, telefono, id, connection);
+        const usuario = await getUserById(id);
+        const resultado = await updateUsuario(nombre, apellido, dni, cuil, correo, telefono, id, connection);
         if (rol.length > 0) {
             await deleteRolesFromUser(id, connection);
             for (const r of rol) {
@@ -56,8 +58,8 @@ export const editarUsuario = async (req, res) => {
             }
         }
         //Logica de que si cambia el dni y la password es su dni. Que tambien cambie la password...
-        const dniIgualAPassword = await verificarPassword(hayOtro[0].password, hayOtro[0].dni);
-        if(dniIgualAPassword){
+        const dniIgualAPassword = await verificarPassword(usuario.password, usuario.dni);
+        if(usuario.dni != dni && dniIgualAPassword){
             const pass = await hashearPassword(dni);
             await updatePassword(pass, id);
         }
@@ -66,7 +68,7 @@ export const editarUsuario = async (req, res) => {
             return res.json("Usuario editado.");
         }
         return res.json("No se pudo editar el usuario.");
-    } catch (error) {
+    } catch (error){
         await connection.rollback();
         console.log(error);
         return res.status(500).json({ error: "Error al editar usuario" });
@@ -165,9 +167,14 @@ export const cambiarRol = async (req, res) => {
 
 export const cambiarPassword = async (req, res) => {
     const { id } = req.params;
-    const { password } = req.body;
+    const { actual, nueva } = req.body;
     try {
-        const pass = await hashearPassword(password);
+        const {password} = await getPassUserById(id); //recuperamos la actual del user...
+        const coinciden = await verificarPassword(password, actual);
+        if(!coinciden){
+            return res.status(500).json("Contraseña actual incorrecta");
+        }
+        const pass = await hashearPassword(nueva);
         const resultado = await updatePassword(pass, id);
         if (resultado.affectedRows > 0) {
             return res.json("Password cambiada.");
@@ -184,7 +191,7 @@ export const loginUsuario = async (req, res) => {
     try {
         const tokens = await login(dni, password);
         if ("error" in tokens) {
-            return res.status(401).json("dni y/o password incorrecto");
+            return res.status(401).json(tokens.error);
         }
         const { access_token, refresh_token, nombre } = tokens;
         //Guardamos el token para las peticiones 401 en una cookie segura en el backend...

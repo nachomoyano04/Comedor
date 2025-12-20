@@ -51,7 +51,7 @@ export const refreshAccessToken = usuario => {
         dni: usuario.dni,
         rol_id: usuario.rol_id,
         nombre_rol: usuario.nombre_rol
-    }, REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+    }, REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
 };
 
 //Verificar refresh_token
@@ -77,12 +77,15 @@ export const registerUser = async (rol_id, nombre, apellido, dni, cuil, telefono
 export const login = async (dni, password) => {
     const usuario = await findUsuarioByDNI(dni);
     if (usuario.length == 0) {
-        return ({ error: "Usuario no encontrado" });
+        return ({ error: "Dni y/o contraseña incorrectos" });
+    }
+    if (usuario[0].estado == 0) {
+        return ({ error: "Su cuenta esta desactivada, pedir activación al Admin"});
     }
     const passwordUser = await getPasswordByDNI(dni);
-    const passValida = await verificarPassword(passwordUser.password, password);
-    if (!passValida) {
-        return ({ error: "Password incorrecta" });
+    const coinciden = await verificarPassword(passwordUser.password, password);
+    if (!coinciden) {
+        return ({ error: "Dni y/o contraseña incorrectos" });
     }
     const access_token = generateAccessToken(usuario[0]);
     const refresh_token = refreshAccessToken(usuario[0]);
