@@ -32,25 +32,27 @@ export const verificarPassword = async (hash, pass) => {
 
 //Generar token
 export const generateAccessToken = usuario => {
+    console.log(usuario);
+    const roles = usuario.map(u => u.numero_rol);
     return jwt.sign({
-        id: usuario.id,
-        nombre: usuario.nombre,
-        apellido: usuario.apellido,
-        dni: usuario.dni,
-        rol_id: usuario.rol_id,
-        nombre_rol: usuario.nombre_rol
+        id: usuario[0].id,
+        nombre: usuario[0].nombre,
+        apellido: usuario[0].apellido,
+        dni: usuario[0].dni,
+        roles
     }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
 };
 
 //Renovamos token
 export const refreshAccessToken = usuario => {
+    console.log(usuario);
+    const roles = usuario.map(u => u.numero_rol);
     return jwt.sign({
-        id: usuario.id,
-        nombre: usuario.nombre,
-        apellido: usuario.apellido,
-        dni: usuario.dni,
-        rol_id: usuario.rol_id,
-        nombre_rol: usuario.nombre_rol
+        id: usuario[0].id,
+        nombre: usuario[0].nombre,
+        apellido: usuario[0].apellido,
+        dni: usuario[0].dni,
+        roles
     }, REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
 };
 
@@ -80,14 +82,14 @@ export const login = async (dni, password) => {
         return ({ error: "Dni y/o contraseña incorrectos" });
     }
     if (usuario[0].estado == 0) {
-        return ({ error: "Su cuenta esta desactivada, pedir activación al Admin"});
+        return ({ error: "Su cuenta esta desactivada, pedir activación al Admin" });
     }
     const passwordUser = await getPasswordByDNI(dni);
     const coinciden = await verificarPassword(passwordUser.password, password);
     if (!coinciden) {
         return ({ error: "Dni y/o contraseña incorrectos" });
     }
-    const access_token = generateAccessToken(usuario[0]);
-    const refresh_token = refreshAccessToken(usuario[0]);
+    const access_token = generateAccessToken(usuario);
+    const refresh_token = refreshAccessToken(usuario);
     return { access_token, refresh_token, nombre: usuario[0].nombre };
 }
