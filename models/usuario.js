@@ -63,7 +63,7 @@ export const getPasswordByDNI = async dni => {
 }
 
 export const findUsuarioByDNI = async (dni) => {
-    const query = `SELECT u.id, u.nombre, u.apellido, u.dni, u.cuil, u.correo, u.telefono, u.estado, ur.rol_id, r.nombre_rol 
+    const query = `SELECT u.id, u.nombre, u.apellido, u.dni, u.cuil, u.correo, u.telefono, u.estado, ur.rol_id, r.nombre_rol, r.numero_rol 
                     FROM usuario AS u 
                     LEFT JOIN usuario_rol AS ur ON u.id = ur.usuario_id 
                     LEFT JOIN rol AS r ON ur.rol_id = r.id
