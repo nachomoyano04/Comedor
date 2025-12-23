@@ -45,7 +45,6 @@ export const generateAccessToken = usuario => {
 
 //Renovamos token
 export const refreshAccessToken = usuario => {
-    console.log(usuario);
     const roles = usuario.map(u => u.numero_rol);
     return jwt.sign({
         id: usuario[0].id,

@@ -226,7 +226,7 @@ export const renovar_token = async (req, res) => {
             return res.status(401).json({ error: "Usuario no encontrado" });
         }
 
-        const nuevo_access_token = generateAccessToken(usuario[0]);
+        const nuevo_access_token = generateAccessToken(usuario);
         return res.json({ access_token: nuevo_access_token });
     } catch (error) {
         console.log(error);
