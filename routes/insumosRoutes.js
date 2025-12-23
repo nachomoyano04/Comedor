@@ -1,6 +1,8 @@
 import express from "express";
 import { activarInsumo, borrarInsumo, editarInsumo, listarInsumos, listarInsumosParaReceta, nuevoInsumo, obtenerInsumo } from "../controllers/insumosController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { roleMiddleware } from "../middleware/roleMiddleware.js";
+import { ROLES } from "../constants/roles.js";
 
 const router = express.Router();
 
@@ -9,6 +11,9 @@ router.use(authMiddleware); //Middleware de autenticacion con jwt
 router.get("/", listarInsumos)
 router.get("/receta", listarInsumosParaReceta);
 router.get("/id/:id", obtenerInsumo);
+
+router.use(roleMiddleware([ROLES.ADMIN, ROLES.COCINA]));
+
 router.post("/", nuevoInsumo);
 router.put("/:id", editarInsumo);
 router.patch("/del/:id", borrarInsumo);

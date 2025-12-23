@@ -1,10 +1,14 @@
 import express from "express";
 import { agregarInsumoALaProduccion, altaBajaProduccion, editarProduccion, modificarInsumoDeProduccion, nuevaProduccion, obtenerProducciones, insumosPorProduccion, calcularCostoPrimoTotal, obtenerProduccionPorId } from "../controllers/produccionController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { roleMiddleware } from "../middleware/roleMiddleware.js";
+import { ROLES } from "../constants/roles.js";
 
 const router = express.Router();
 
 router.use(authMiddleware); //Middleware de autenticacion con jwt
+
+router.use(roleMiddleware([ROLES.ADMIN, ROLES.COCINA]));
 
 router.get("/", obtenerProducciones);
 router.get("/:id", obtenerProduccionPorId);
