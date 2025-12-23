@@ -14,16 +14,16 @@ router.use(authMiddleware); //Middleware de autenticacion con jwt
 
 router.patch("/pass/:id", cambiarPassword);
 router.put("/:id", editarUsuario);
+router.get("/dni/:dni", buscarUsuarioPorDni);
+router.get("/rol/:rol_id", obtenerUsuariosPorRol);
 
 router.use(roleMiddleware([ROLES.ADMIN]));
 
-router.get("/dni/:dni", buscarUsuarioPorDni);
 router.get("/", obtenerUsuarios);
 router.post("/", nuevoUsuario);
 router.patch("/del/:id", borrarUsuario);
 router.patch("/alt/:id", activarUsuario);
 router.post("/rol", nuevoRolAUsuario);
-router.get("/rol/:rol_id", obtenerUsuariosPorRol);
 router.patch("/rol/:rol_id/cambiar/:id", cambiarRol); // <- ver si realmente nos sirve. Como puede ser mas de un rol...
 
 export default router;
