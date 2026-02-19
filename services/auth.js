@@ -32,7 +32,6 @@ export const verificarPassword = async (hash, pass) => {
 
 //Generar token
 export const generateAccessToken = usuario => {
-    console.log(usuario);
     const roles = usuario.map(u => u.numero_rol);
     return jwt.sign({
         id: usuario[0].id,

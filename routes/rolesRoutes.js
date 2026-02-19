@@ -8,9 +8,10 @@ const router = express.Router();
 
 router.use(authMiddleware); //Middleware de autenticacion con jwt
 
+router.get("/", listarRoles);
+
 router.use(roleMiddleware([ROLES.ADMIN]));
 
-router.get("/", listarRoles);
 router.get("/usuario/:usuario_id", listarRolesPorUsuario);
 router.post("/", nuevoRol);
 router.put("/:id", editarRol);
