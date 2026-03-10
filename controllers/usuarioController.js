@@ -140,6 +140,16 @@ export const obtenerUsuariosPorRol = async (req, res) => {
     }
 }
 
+export const obtenerUsuarioPorId = async (req, res) => {
+    const {id} = req.params;
+    try {
+        const resultado = await 
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Error al obtener usuarios" });
+    }
+}
+
 export const buscarUsuarioPorDni = async (req, res) => {
     const { dni } = req.params;
     try {
