@@ -15,6 +15,7 @@ export const getProduccion_Insumo = async() => {
     const query = "SELECT * FROM produccion_insumo";
     try{
         const resultado = await pool.query(query);
+        return resultado[0];
     }catch(error){
         throw error;
     }
