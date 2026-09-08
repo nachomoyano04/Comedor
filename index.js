@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 3000;
 
 //CORS
 const corsOptions = {
-    origin: `http://localhost:5173`, //Luego -> https://dominio_produccion.com
+    origin: process.env.CORS_ORIGIN,
     credentials: true
 }
 
