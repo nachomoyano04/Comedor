@@ -22,7 +22,7 @@ export const getConProvByIdProveedor = async (proveedor_id) => {
 }
 //UPDATE
 export const updateContactoProveedor = async (proveedor_id, nombre, telefono, email, es_principal, id) => {
-    const query = "UPDATE contacto_proveedor SET proveedor_id = ?, nombre = ?, telefono = ?, email = ?, es_principal = ? WHERE id = ?";
+    const query = "UPDATE contacto_proveedor SET proveedor_id = ?, nombre_contacto = ?, telefono_contacto = ?, email_contacto = ?, es_principal = ? WHERE id_contacto = ?";
     try{
         const resultado = await pool.query(query, [proveedor_id, nombre, telefono, email, es_principal, id]);
         return resultado[0];

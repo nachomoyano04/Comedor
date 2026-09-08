@@ -43,7 +43,7 @@ export const getPassUserById = async id => {
 }
 
 export const getUsuariosByRol = async (rol_id) => {
-    const query = "SELECT * FROM usuario_rol JOIN usuario WHERE rol_id = ?";
+    const query = "SELECT u.* FROM usuario_rol AS ur JOIN usuario AS u ON u.id = ur.usuario_id WHERE ur.rol_id = ?";
     try{
         const resultado = await pool.query(query, [rol_id]);
         return resultado[0];
