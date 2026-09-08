@@ -7,7 +7,7 @@ export const nuevoProveedor = async (req, res) => {
         //Chequeamos de que el codigo, cuit o email no coincida con ningun otro
         const hayOtraCoincidencia = await getByCodigoCuitOrEmail(proveedor.codigo, proveedor.cuit, proveedor.email);
         if(hayOtraCoincidencia.length > 0){
-            return res.status(500).json("Se encontró una coincidencia en CUIT, codigo o email");
+            return res.status(409).json({ error: "Se encontró una coincidencia en CUIT, código o email" });
         }
         const resultado = await insertProveedor(proveedor);
         if(resultado.affectedRows == 1){
@@ -27,7 +27,7 @@ export const editarProveedor = async (req, res) => {
         //Chequeamos de que no haya otro proveedor con ese cuit, codigo o email
         const hayOtraCoincidencia = await getByCodigoCuitOrEmail(codigo, cuit, email, id);
         if(hayOtraCoincidencia.length > 0){
-            return res.status(500).json("Se encontró una coincidencia en CUIT, codigo o email");
+            return res.status(409).json({ error: "Se encontró una coincidencia en CUIT, código o email" });
         }
         const resultado = await updateProveedor(codigo, razon_social, nombre_fantasia, cuit, horarios_atencion, domicilio, localidad, email, id);
         if(resultado.affectedRows == 1){

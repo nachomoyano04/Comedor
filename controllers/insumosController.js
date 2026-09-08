@@ -7,7 +7,7 @@ export const listarInsumos = async (req, res) => {
         return res.json(insumos);
     }catch(error){
         console.log(error);
-        return res.status(500).json({error: "Error al listar los insumos", mensaje: error.sqlMessage});
+        return res.status(500).json({error: "Error al listar los insumos", message: error.sqlMessage});
     }
 }
 export const listarInsumosParaReceta = async (req, res) => {
@@ -16,7 +16,7 @@ export const listarInsumosParaReceta = async (req, res) => {
         return res.json(insumos);
     }catch(error){
         console.log(error);
-        return res.status(500).json({error: "Error al listar los insumos", mensaje: error.sqlMessage});
+        return res.status(500).json({error: "Error al listar los insumos", message: error.sqlMessage});
     }
 }
 
@@ -28,7 +28,7 @@ export const obtenerInsumo = async (req, res) => {
         return res.json(insumo);
     } catch (error) {
         console.log(error);
-        return res.status(500).json({error: "Error al obtener insumo", mensaje: error.sqlMessage});   
+        return res.status(500).json({error: "Error al obtener insumo", message: error.sqlMessage});   
     } finally {
         connection.release();
     }
@@ -39,7 +39,7 @@ export const nuevoInsumo = async (req, res) => {
     try{
         const hayInsumo = await getInsumoByCodigo(insumo.codigo);
         if(hayInsumo.length > 0){
-            return res.status(500).json("Codigo duplicado");
+            return res.status(409).json({ error: "Código duplicado" });
         }
         const resultado = await insertInsumo(insumo);
         if(resultado.affectedRows == 1){
@@ -48,7 +48,7 @@ export const nuevoInsumo = async (req, res) => {
         return res.json("No se pudo registrar el insumo.");
     }catch(error){
         console.log(error);
-        return res.status(500).json({error: "Error al crear insumo", mensaje: error.sqlMessage});    
+        return res.status(500).json({error: "Error al crear insumo", message: error.sqlMessage});    
     }
 }
 
@@ -58,7 +58,7 @@ export const editarInsumo = async (req, res) => {
     try{
         const hayInsumo = await getInsumoByCodigo(codigo);
         if(hayInsumo.length > 0 && hayInsumo[0].id != id){
-            return res.status(500).json("Codigo duplicado");
+            return res.status(409).json({ error: "Código duplicado" });
         }
         const resultado = await updateInsumo(codigo, producto, marca, id_unidad_de_medida, id);
         if(resultado.affectedRows > 0){
@@ -67,7 +67,7 @@ export const editarInsumo = async (req, res) => {
         return res.json("No se pudo editar el insumo");
     }catch(error){
         console.log(error);
-        return res.status(500).json({error: "Error al editar insumo", mensaje: error.sqlMessage});
+        return res.status(500).json({error: "Error al editar insumo", message: error.sqlMessage});
     }
 }
 
@@ -81,7 +81,7 @@ export const borrarInsumo = async (req, res) => {
         return res.json("No se pudo borrar el insumo");
     } catch (error) {
         console.log(error);
-        return res.status(500).json({error: "Error al eliminar insumo", mensaje: error.sqlMessage});
+        return res.status(500).json({error: "Error al eliminar insumo", message: error.sqlMessage});
     }
 }
 
@@ -95,6 +95,6 @@ export const activarInsumo = async (req, res) => {
         return res.json("No se pudo activar el insumo");
     } catch (error) {
         console.log(error);
-        return res.status(500).json({error: "Error al activar insumo", mensaje: error.sqlMessage});
+        return res.status(500).json({error: "Error al activar insumo", message: error.sqlMessage});
     }
 }
