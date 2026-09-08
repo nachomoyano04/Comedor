@@ -4,12 +4,13 @@ import dayjs from "dayjs";
 import pool from "../config/database.js";
 
 export const nuevaReceta = async (req, res) => {
-    const {nombre, descripcion, insumo} = req.body;
+    const {nombre, descripcion, cuantos_comen, insumo} = req.body;
     const connection = await pool.getConnection();
-    try{
-        const fecha = dayjs().format("YYYY-MM-DD HH:mm:ss");
+    try {
+        await connection.beginTransaction();
+        const fecha = dayjs().format("YYYY-MM-DD");
         const estado = 1;
-        const receta = {nombre, descripcion, fecha, estado}
+        const receta = {nombre, descripcion, cuantos_comen, fecha, estado};
         const id = await insertReceta(receta);
         for(const i of insumo){
             await insertReceta_Insumo({receta_id: id, insumo_id: i.value, cantidad: i.cantidad})
