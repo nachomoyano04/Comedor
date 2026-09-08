@@ -1,6 +1,7 @@
 import { changeStateUser, findByDniOrCuil, findUsuarioByDNI, getPassUserById, getUserById, getUsuarios, getUsuariosByRol, insertUsuario, updatePassword, updateRol, updateUsuario } from "../models/usuario.js";
 import { generateAccessToken, hashearPassword, login, validateRefreshToken, verificarPassword } from "../services/auth.js";
 import { deleteRolesFromUser, getRolesByUser, insertUsuario_Rol } from "../models/roles.js";
+import { ROLES } from "../constants/roles.js";
 import pool from "../config/database.js";
 
 export const nuevoUsuario = async (req, res) => {
@@ -38,42 +39,43 @@ export const nuevoUsuario = async (req, res) => {
 }
 
 export const editarUsuario = async (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
     const { nombre, apellido, dni, cuil, correo, telefono, rol } = req.body;
-    console.log(req.body);
+
+    const esUnoMismo = String(req.user.id) === String(id);
+    const esAdmin = req.user.roles?.includes(ROLES.ADMIN);
+
+    if (!esUnoMismo && !esAdmin) {
+        return res.status(403).json({ error: "No tiene permisos para editar este usuario" });
+    }
+    
+    const rolAAplicar = esAdmin ? rol : [];
     const connection = await pool.getConnection();
+    
     try {
         await connection.beginTransaction();
-        //Chequeamos de que no haya otro con ese dni o cuil
-        const hayOtro = await findByDniOrCuil(dni, cuil, id);
-        if (hayOtro.length > 0 && hayOtro[0].id != id) {
-            return res.status(500).json("Dni o cuil ya existentes");
+        const coincidencia = await findByDniOrCuil(dni, cuil, id);
+        if (coincidencia.length > 0) {
+            await connection.rollback();
+            return res.status(409).json({ error: "Dni o cuil ya existentes" });
         }
-        const usuario = await getUserById(id);
-        const resultado = await updateUsuario(nombre, apellido, dni, cuil, correo, telefono, id, connection);
-        if (rol.length > 0) {
+        
+        await updateUsuario(nombre, apellido, dni, cuil, correo, telefono, id, connection);
+        
+        if (rolAAplicar && rolAAplicar.length > 0) {
             await deleteRolesFromUser(id, connection);
-            for (const r of rol) {
+            for (const r of rolAAplicar) {
                 await insertUsuario_Rol({ usuario_id: id, rol_id: r }, connection);
             }
         }
-        //Logica de que si cambia el dni y la password es su dni. Que tambien cambie la password...
-        const dniIgualAPassword = await verificarPassword(usuario.password, usuario.dni);
-        if(usuario.dni != dni && dniIgualAPassword){
-            const pass = await hashearPassword(dni);
-            await updatePassword(pass, id);
-        }
         await connection.commit();
-        if (resultado.affectedRows > 0) {
-            return res.json("Usuario editado.");
-        }
-        return res.json("No se pudo editar el usuario.");
-    } catch (error){
+        return res.json("Usuario editado con éxito");
+    } catch (error) {
         await connection.rollback();
         console.log(error);
         return res.status(500).json({ error: "Error al editar usuario" });
     } finally {
-        connection.release()
+        connection.release();
     }
 }
 
@@ -168,6 +170,9 @@ export const cambiarRol = async (req, res) => {
 export const cambiarPassword = async (req, res) => {
     const { id } = req.params;
     const { actual, nueva } = req.body;
+    if (String(req.user.id) !== String(id) && !req.user.roles?.includes(ROLES.ADMIN)) {
+        return res.status(403).json({ error: "No tiene permisos para cambiar esta contraseña" });
+    }
     try {
         const {password} = await getPassUserById(id); //recuperamos la actual del user...
         const coinciden = await verificarPassword(password, actual);
