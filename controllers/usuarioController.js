@@ -13,7 +13,7 @@ export const nuevoUsuario = async (req, res) => {
         //Chequeamos de que no haya otro usuario con ese dni o cuil...
         const hayOtro = await findByDniOrCuil(dni, cuil);
         if (hayOtro.length > 0) {
-            return res.status(500).json("Dni o cuil ya existentes");
+            return res.status(409).json({ error: "Dni o cuil ya existentes" });
         }
         usuario.estado = 1;
         usuario.password = await hashearPassword(usuario.dni);
