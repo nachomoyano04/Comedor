@@ -1,12 +1,12 @@
 import pool from "../config/database.js";
 
 //CREATE
-export const insertReceta_Insumo = async receta_insumo => {
+export const insertReceta_Insumo = async (receta_insumo, connection) => {
     const query = "INSERT INTO receta_insumo SET ?";
-    try{
-        const resultado = await pool.query(query, receta_insumo);
-        return resultado[0];
-    }catch(error){
+    try {
+        const resultado = await connection.query(query, [receta_insumo]);
+        return resultado[0].insertId;
+    } catch (error) {
         throw error;
     }
 }
@@ -41,11 +41,11 @@ export const deleteReceta_Insumo = async (id) => {
     }
 }
 
-export const deleteInsumosDeReceta = async id => {
+export const deleteInsumosDeReceta = async (receta_id, connection) => {
     const query = "DELETE FROM receta_insumo WHERE receta_id = ?";
     try {
-        const resultado = await pool.query(query, [id]);
-        return resultado[0];
+        const resultado = await connection.query(query, [receta_id]);
+        return resultado[0].affectedRows;
     } catch (error) {
         throw error;
     }

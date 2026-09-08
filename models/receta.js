@@ -2,14 +2,12 @@ import pool from "../config/database.js";
 import dayjs from "dayjs";
 
 //CREATE
-export const insertReceta = async receta => {
-    receta.fecha = dayjs().format("YYYY-MM-DD HH:mm:ss");
-    receta.estado = 1;
+export const insertReceta = async (receta, connection) => {
     const query = "INSERT INTO receta SET ?";
-    try{
-        const resultado = await pool.query(query, receta);
-        return resultado[0].insertId; // devolvemos el id creado
-    }catch(error){
+    try {
+        const resultado = await connection.query(query, [receta]);
+        return resultado[0].insertId;
+    } catch (error) {
         throw error;
     }
 }
@@ -36,12 +34,12 @@ export const getRecetaById = async id => {
 }
 
 //UPDATE
-export const updateReceta = async (nombre, descripcion, cuantos_comen, id) => {
+export const updateReceta = async (nombre, descripcion, cuantos_comen, id, connection) => {
     const query = "UPDATE receta SET nombre = ?, descripcion = ?, cuantos_comen = ? WHERE id = ?";
-    try{
-        const resultado = await pool.query(query, [nombre, descripcion, cuantos_comen, id]);
-        return resultado[0];
-    }catch(error){
+    try {
+        const resultado = await connection.query(query, [nombre, descripcion, cuantos_comen, id]);
+        return resultado[0].affectedRows;
+    } catch (error) {
         throw error;
     }
 }
