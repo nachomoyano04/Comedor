@@ -8,7 +8,7 @@ const pool = createPool({
   database: process.env.DB_DATABASE,
   timezone: "-3:00",
   ssl: {
-    rejectUnauthorized: true,
+    rejectUnauthorized: false,
   },
 });
 export default pool;
