@@ -64,9 +64,10 @@ export const updateInsumo = async (c, p, m, udm, id) => {
 }
 
 export const updateStockInsumo = async (insumo_id, stock, connection) => {
+    const conn = connection || pool;
     const query = "UPDATE insumo SET stock = ? WHERE id = ?";
     try {
-        const resultado = await connection.query(query, [stock, insumo_id]);
+        const resultado = await conn.query(query, [stock, insumo_id]);
         return resultado[0];
     } catch (error) {
         throw error;

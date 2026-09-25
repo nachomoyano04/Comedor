@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-// import errorMiddleware from "./middleware/errorMiddleware.js";
+import errorMiddleware from "./middleware/errorMiddleware.js";
 import insumosRouter from "./routes/insumosRoutes.js";
 import precioRouter from "./routes/precioRoutes.js";
 import produccionRouter from "./routes/produccionRoutes.js";
@@ -10,7 +10,7 @@ import rolesRouter from "./routes/rolesRoutes.js";
 import unidad_de_medidaRouter from "./routes/unidad_de_medidaRoutes.js";
 import usuarioRouter from "./routes/usuarioRoutes.js";
 import cors from "cors";
-import cookieParser from "cookie-parser"
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -33,7 +33,7 @@ const corsOptions = {
         }
     },
     credentials: true
-}
+};
 
 app.use(cors(corsOptions));
 
@@ -48,6 +48,11 @@ app.use(express.json());
 //Cookie parser
 app.use(cookieParser());
 
+// Healthcheck endpoint para Docker / Kubernetes / Render / Railway
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 //Rutas
 app.use("/insumos", insumosRouter);
 app.use("/precio", precioRouter);
@@ -58,8 +63,13 @@ app.use("/roles", rolesRouter);
 app.use("/udm", unidad_de_medidaRouter);
 app.use("/usuario", usuarioRouter);
 
+// 404 Handler
+app.use((req, res, next) => {
+    res.status(404).json({ error: `Ruta no encontrada: ${req.method} ${req.originalUrl}` });
+});
+
 //Error Middleware
-// app.use(errorMiddleware);
+app.use(errorMiddleware);
 
 //Levantamos el servidor
 app.listen(PORT, () => {

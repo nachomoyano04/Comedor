@@ -1,6 +1,6 @@
 import pool from "../config/database.js";
 import { getInsumo, updateStockInsumo } from "../models/insumos.js";
-import { deletePrecio, getPrecioById, getPrecioByInsumo, getPrecios, insertPrecio, makeFechaNull, updateFechaHasta } from "../models/precio.js";
+import { deletePrecio, getPrecioById, getPrecioByInsumo, getPrecios, insertPrecio, makeFechaNull, updateFechaHasta, getAlertasVencimientos, getSugerenciasFIFO } from "../models/precio.js";
 
 export const crearPrecio = async (req, res) => {
     const precio = { ...req.body };
@@ -88,3 +88,50 @@ export const borrarPrecio = async (req, res) => {
         connection.release();
     }
 }
+
+export const obtenerAlertasVencimiento = async (req, res) => {
+    try {
+        const registros = await getAlertasVencimientos();
+        
+        const vencidos = [];
+        const criticos3Dias = [];
+        const alerta7Dias = [];
+        const proximos15Dias = [];
+        const otros = [];
+
+        for (const item of registros) {
+            const dias = parseInt(item.dias_para_vencer, 10);
+            if (dias < 0) {
+                vencidos.push({ ...item, dias_para_vencer: dias, severidad: "vencido" });
+            } else if (dias <= 3) {
+                criticos3Dias.push({ ...item, dias_para_vencer: dias, severidad: "critico" });
+            } else if (dias <= 7) {
+                alerta7Dias.push({ ...item, dias_para_vencer: dias, severidad: "alerta" });
+            } else if (dias <= 15) {
+                proximos15Dias.push({ ...item, dias_para_vencer: dias, severidad: "proximo" });
+            } else {
+                otros.push({ ...item, dias_para_vencer: dias, severidad: "normal" });
+            }
+        }
+
+        const sugerenciasFIFO = await getSugerenciasFIFO();
+
+        return res.json({
+            resumen: {
+                totalVencidos: vencidos.length,
+                totalCriticos3Dias: criticos3Dias.length,
+                totalAlerta7Dias: alerta7Dias.length,
+                totalProximos15Dias: proximos15Dias.length,
+                totalAlertas: vencidos.length + criticos3Dias.length + alerta7Dias.length + proximos15Dias.length
+            },
+            vencidos,
+            criticos3Dias,
+            alerta7Dias,
+            proximos15Dias,
+            sugerenciasFIFO: sugerenciasFIFO.slice(0, 15)
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Error al obtener alertas de vencimiento" });
+    }
+};

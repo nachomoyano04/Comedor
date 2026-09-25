@@ -20,10 +20,11 @@ export const getProduccion_Insumo = async() => {
         throw error;
     }
 }
-export const getInsumosByProduccion = async id => {
+export const getInsumosByProduccion = async (id, connection) => {
+    const conn = connection || pool;
     const query = "SELECT * FROM produccion_insumo JOIN insumo ON insumo_id = insumo.id WHERE produccion_id = ?";
     try{
-        const resultado = await pool.query(query, [id]);
+        const resultado = await conn.query(query, [id]);
         return resultado[0];
     }catch(error){
         throw error;

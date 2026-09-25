@@ -20,10 +20,10 @@ export const getProducciones = async () => {
                     p.cantidad_comensales, p.turno, p.estado, r.nombre, r.descripcion, 
                     i.producto, pi.cantidad_usada, udm.simbolo, pi.insumo_id 
                     FROM produccion AS p 
-                    JOIN receta AS r ON p.receta_id = r.id 
-                    JOIN produccion_insumo AS pi ON pi.produccion_id = p.id 
-                    JOIN insumo AS i ON pi.insumo_id = i.id 
-                    JOIN unidad_de_medida AS udm ON i.id_unidad_de_medida = udm.id
+                    LEFT JOIN receta AS r ON p.receta_id = r.id 
+                    LEFT JOIN produccion_insumo AS pi ON pi.produccion_id = p.id 
+                    LEFT JOIN insumo AS i ON pi.insumo_id = i.id 
+                    LEFT JOIN unidad_de_medida AS udm ON i.id_unidad_de_medida = udm.id
                     ORDER BY p.fecha DESC`;
     try{
         const resultado = await pool.query(query);
@@ -89,10 +89,11 @@ export const updateCostoPrimoTotalProduccion = async (cpt, id, connection) => {
 }
 
 //DELETE
-export const changeStateOfProduccion = async (estado, id) => {
+export const changeStateOfProduccion = async (estado, id, connection) => {
+    const conn = connection || pool;
     const query = "UPDATE produccion set estado = ? WHERE id = ?";
     try{
-        const resultado = await pool.query(query, [estado == 1? 0 : 1, id]);
+        const resultado = await conn.query(query, [estado == 1? 0 : 1, id]);
         return resultado[0];
     }catch(error){
         throw error;

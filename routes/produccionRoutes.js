@@ -8,15 +8,18 @@ const router = express.Router();
 
 router.use(authMiddleware); //Middleware de autenticacion con jwt
 
+// Rutas de consulta / lectura: disponibles para Administrador, Cocina y Directivos (para métricas y reportes)
+router.get("/", roleMiddleware([ROLES.ADMIN, ROLES.COCINA, ROLES.DIRECTIVOS]), obtenerProducciones);
+router.get("/:id", roleMiddleware([ROLES.ADMIN, ROLES.COCINA, ROLES.DIRECTIVOS]), obtenerProduccionPorId);
+router.get("/cpt/:id", roleMiddleware([ROLES.ADMIN, ROLES.COCINA, ROLES.DIRECTIVOS]), calcularCostoPrimoTotal);
+router.get("/insumo/:id", roleMiddleware([ROLES.ADMIN, ROLES.COCINA, ROLES.DIRECTIVOS]), insumosPorProduccion);
+
+// Rutas de escritura y modificación: restringidas a Cocina y Administrador
 router.use(roleMiddleware([ROLES.ADMIN, ROLES.COCINA]));
 
-router.get("/", obtenerProducciones);
-router.get("/:id", obtenerProduccionPorId);
 router.post("/", nuevaProduccion);
 router.put("/:id", editarProduccion);
 router.patch("/:id/estado/:num", altaBajaProduccion);
-router.get("/cpt/:id", calcularCostoPrimoTotal);
-router.get("/insumo/:id", insumosPorProduccion);
 router.post("/insumo", agregarInsumoALaProduccion);
 router.put("/insumo/:id", modificarInsumoDeProduccion);
 
