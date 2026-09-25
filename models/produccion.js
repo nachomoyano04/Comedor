@@ -5,6 +5,7 @@ import pool from "../config/database.js";
 export const insertProduccion = async (produccion, connection) => {
     produccion.fecha = dayjs().format("YYYY-MM-DD HH:mm:ss");
     produccion.estado = 1;
+    produccion.costo_primo_total = produccion.costo_primo_total ?? 0;
     const query = "INSERT INTO produccion SET ?";
     try{
         const resultado = await connection.query(query, produccion);

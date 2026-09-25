@@ -42,6 +42,7 @@ export const getInsumoByCodigo = async codigo => {
 //CREATE
 export const insertInsumo = async insumo => {
     insumo.estado = 1;
+    insumo.stock = insumo.stock ?? 0;
     const query = "INSERT INTO insumo SET ?";
     try{
         const resultado = await pool.query(query, insumo);

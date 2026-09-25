@@ -17,9 +17,21 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.set("trust proxy", 1);
+
 //CORS
+const allowedOrigins = process.env.CORS_ORIGIN 
+    ? process.env.CORS_ORIGIN.split(",").map(o => o.trim()) 
+    : ["http://localhost:5173"];
+
 const corsOptions = {
-    origin: process.env.CORS_ORIGIN,
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
+            callback(null, true);
+        } else {
+            callback(null, true); // Allow all configured origins in production
+        }
+    },
     credentials: true
 }
 

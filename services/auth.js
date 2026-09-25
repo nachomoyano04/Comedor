@@ -39,7 +39,7 @@ export const generateAccessToken = usuario => {
         apellido: usuario[0].apellido,
         dni: usuario[0].dni,
         roles
-    }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+    }, ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
 };
 
 //Renovamos token
@@ -51,7 +51,7 @@ export const refreshAccessToken = usuario => {
         apellido: usuario[0].apellido,
         dni: usuario[0].dni,
         roles
-    }, REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
+    }, REFRESH_TOKEN_SECRET, { expiresIn: '30d' });
 };
 
 //Verificar refresh_token

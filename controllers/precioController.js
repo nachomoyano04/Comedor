@@ -3,8 +3,10 @@ import { getInsumo, updateStockInsumo } from "../models/insumos.js";
 import { deletePrecio, getPrecioById, getPrecioByInsumo, getPrecios, insertPrecio, makeFechaNull, updateFechaHasta } from "../models/precio.js";
 
 export const crearPrecio = async (req, res) => {
-    const precio = req.body;
-    console.log(precio);
+    const precio = { ...req.body };
+    if (!precio.fecha_vencimiento) {
+        delete precio.fecha_vencimiento;
+    }
     const connection = await pool.getConnection();
     try{
         await connection.beginTransaction();
@@ -14,18 +16,20 @@ export const crearPrecio = async (req, res) => {
         }
         const resultadoPrecio = await insertPrecio(precio, connection);
         const insumo = await getInsumo(precio.insumo_id, connection);
-        const stock = parseInt(insumo.stock) + parseInt(precio.cantidad);
+        const stockActual = parseFloat(insumo?.stock) || 0;
+        const cantidadComprada = parseFloat(precio.cantidad) || 0;
+        const stock = stockActual + cantidadComprada;
         const resultadoStock = await updateStockInsumo(precio.insumo_id, stock, connection);
         if(resultadoPrecio.affectedRows == 1 && resultadoStock.affectedRows == 1){
             await connection.commit();
             return res.json("Precio registrado.");
         }
-        await connection.rollback()
+        await connection.rollback();
         return res.status(500).json({error: "No se pudo registrar el precio."});
     }catch(error){
-        await connection.rollback()
+        await connection.rollback();
         console.log(error); 
-        return res.status(500).json({error: "Error al crear precio"});
+        return res.status(500).json({error: "Error al crear precio: " + (error.sqlMessage || error.message)});
     }finally{
         connection.release();
     }
@@ -68,9 +72,9 @@ export const borrarPrecio = async (req, res) => {
         }
         const resultado = await deletePrecio(id, connection);
         const insumo = await getInsumo(insumo_id, connection);
-        const stockInsumo = parseInt(insumo.stock);
-        const cantidadPrecio = parseInt(precio.cantidad);
-        const stock = stockInsumo >= cantidadPrecio? stockInsumo - cantidadPrecio : 0;  
+        const stockInsumo = parseFloat(insumo?.stock) || 0;
+        const cantidadPrecio = parseFloat(precio.cantidad) || 0;
+        const stock = stockInsumo >= cantidadPrecio ? stockInsumo - cantidadPrecio : 0;  
         await updateStockInsumo(insumo_id, stock, connection);
         await connection.commit();
         if(resultado.affectedRows == 1){

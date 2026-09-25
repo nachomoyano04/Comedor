@@ -200,14 +200,15 @@ export const loginUsuario = async (req, res) => {
         }
         const { access_token, refresh_token, nombre } = tokens;
         //Guardamos el token para las peticiones 401 en una cookie segura en el backend...
+        const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.PORT && process.env.PORT !== "6970");
         res.cookie("refresh_token", refresh_token, {
             httpOnly: true,
-            secure: false, //EN PRODUCCION -> true
-            sameSite: "strict",
-            path: "/usuario/auth",
-            maxAge: 7 * 24 * 60 * 60 * 1000 //En 7 días
-        })
-        return res.json({ access_token, mensaje: `Bienvenido ${nombre ? nombre : ""}` });
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 días
+        });
+        return res.json({ access_token, refresh_token, mensaje: `Bienvenido ${nombre ? nombre : ""}` });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: "Error al loguearse" });
@@ -216,7 +217,7 @@ export const loginUsuario = async (req, res) => {
 
 export const renovar_token = async (req, res) => {
     try {
-        const refreshToken = req.cookies.refresh_token;
+        const refreshToken = req.cookies.refresh_token || req.body.refresh_token;
         if (!refreshToken) {
             return res.status(401).json({ error: "No hay refresh token" });
         }
@@ -240,11 +241,12 @@ export const renovar_token = async (req, res) => {
 }
 
 export const eliminar_token_refresh = (req, res) => {
+    const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.PORT && process.env.PORT !== "6970");
     res.clearCookie("refresh_token", {
         httpOnly: true,
-        secure: false, //EN PRODUCCION -> true
-        sameSite: "strict",
-        path: "/usuario/auth"
-    })
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
+        path: "/"
+    });
     res.sendStatus(204);
 }

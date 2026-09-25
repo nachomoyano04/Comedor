@@ -8,27 +8,28 @@ export const nuevaProduccion = async (req, res) => {
     const connection = await pool.getConnection();
     try{
         await connection.beginTransaction();
+        produccion.costo_primo_total = 0;
         const result = await insertProduccion(produccion, connection);
         const produccion_id = result.insertId;
         let costo_primo_total = 0;
-        for(const i of insumos){
+        for(const i of (insumos || [])){
             const resPrecio = await getPrecioActualInsumo(i.value, connection);
-            if(resPrecio){
+            if(resPrecio && resPrecio.precio_unitario != null){
                 const {precio_unitario} = resPrecio;
-                costo_primo_total += parseFloat(precio_unitario) * parseFloat(i.cantidad);
-                await insertProduccion_Insumo({produccion_id, insumo_id: i.value, cantidad_usada: i.cantidad}, connection);
+                costo_primo_total += parseFloat(precio_unitario) * parseFloat(i.cantidad || 0);
+                await insertProduccion_Insumo({produccion_id, insumo_id: i.value, cantidad_usada: Number(i.cantidad) || 0}, connection);
             }else{
                 await connection.rollback();
-                return res.status(500).json({error: `El insumo "${i.label}" no tiene un precio asignado...`});
+                return res.status(400).json({error: `El insumo "${i.label || 'seleccionado'}" no tiene un precio registrado en el sistema. Debe registrar el precio antes de producir con él.`});
             }
         }
         await updateCostoPrimoTotalProduccion(costo_primo_total, produccion_id, connection);
         await connection.commit();
-        return res.json("Produccion registrada.");
+        return res.json("Producción registrada correctamente.");
     }catch(error){
         await connection.rollback();
         console.log(error);
-        return res.status(500).json({error: "Error al registrar nueva producción."});
+        return res.status(500).json({error: "Error al registrar nueva producción: " + (error.sqlMessage || error.message)});
     }finally{
         connection.release();
     }

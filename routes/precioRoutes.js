@@ -10,7 +10,7 @@ router.use(authMiddleware);
 router.get("/:insumo_id", obtenerPrecioPorInsumo);
 router.get("/", obtenerPrecios);
 
-router.use(roleMiddleware([ROLES.ADMIN, ROLES.COMPRADOR]));
+router.use(roleMiddleware([ROLES.ADMIN, ROLES.COMPRADOR, ROLES.COCINA]));
 router.post("/", crearPrecio);
 router.delete("/:id", borrarPrecio);
 

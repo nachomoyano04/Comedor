@@ -20,24 +20,36 @@ export const nuevaReceta = async (req, res) => {
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
-    const fecha = dayjs().format("YYYY-MM-DD");
+    const fecha = dayjs().format("YYYY-MM-DD HH:mm:ss");
     const estado = 1;
-    const receta = { nombre, descripcion, cuantos_comen, fecha, estado };
+    const receta = { 
+      nombre: String(nombre || "").trim(), 
+      descripcion: String(descripcion || "").trim(), 
+      cuantos_comen: Number(cuantos_comen) || 1, 
+      fecha, 
+      estado 
+    };
     const id = await insertReceta(receta, connection);
-    for (const i of insumo) {
-      const receta_insumo = {
-        receta_id: id,
-        insumo_id: i.value,
-        cantidad: i.cantidad,
-      };
-      await insertReceta_Insumo(receta_insumo, connection);
+    if (Array.isArray(insumo)) {
+      for (const i of insumo) {
+        const insumo_id = i.value || i.insumo_id;
+        const cantidad = Number(i.cantidad);
+        if (insumo_id && cantidad > 0) {
+          const receta_insumo = {
+            receta_id: id,
+            insumo_id,
+            cantidad,
+          };
+          await insertReceta_Insumo(receta_insumo, connection);
+        }
+      }
     }
     await connection.commit();
-    return res.json("Receta registrada.");
+    return res.json("Receta registrada con éxito.");
   } catch (error) {
     await connection.rollback();
     console.log(error);
-    return res.status(500).json({ error: "Error al registrar nueva receta" });
+    return res.status(500).json({ error: "Error al registrar nueva receta: " + (error.sqlMessage || error.message) });
   } finally {
     connection.release();
   }
@@ -69,22 +81,28 @@ export const editarReceta = async (req, res) => {
   const { nombre, descripcion, cuantos_comen, insumo } = req.body;
   const connection = await pool.getConnection();
   try {
-    await updateReceta(nombre, descripcion, cuantos_comen, id, connection);
+    await updateReceta(String(nombre || "").trim(), String(descripcion || "").trim(), Number(cuantos_comen) || 1, id, connection);
     await deleteInsumosDeReceta(id, connection);
-    for (const i of insumo) {
-      const receta_insumo = {
-        receta_id: id,
-        insumo_id: i.value,
-        cantidad: i.cantidad,
-      };
-      await insertReceta_Insumo(receta_insumo, connection);
+    if (Array.isArray(insumo)) {
+      for (const i of insumo) {
+        const insumo_id = i.value || i.insumo_id;
+        const cantidad = Number(i.cantidad);
+        if (insumo_id && cantidad > 0) {
+          const receta_insumo = {
+            receta_id: id,
+            insumo_id,
+            cantidad,
+          };
+          await insertReceta_Insumo(receta_insumo, connection);
+        }
+      }
     }
     await connection.commit();
     return res.json("Receta editada.");
   } catch (error) {
     await connection.rollback();
     console.log(error);
-    return res.status(500).json({ error: "Error al editar receta" });
+    return res.status(500).json({ error: "Error al editar receta: " + (error.sqlMessage || error.message) });
   } finally {
     connection.release();
   }
