@@ -8,8 +8,8 @@ const router = express.Router();
 router.use(authMiddleware);
 
 router.get("/vencimientos/alertas", obtenerAlertasVencimiento);
-router.get("/:insumo_id", obtenerPrecioPorInsumo);
 router.get("/", obtenerPrecios);
+router.get("/:insumo_id", obtenerPrecioPorInsumo);
 
 router.use(roleMiddleware([ROLES.ADMIN, ROLES.COMPRADOR, ROLES.COCINA]));
 router.post("/", crearPrecio);

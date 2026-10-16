@@ -116,6 +116,20 @@ async function runTestSuite() {
         const stockPostCompra = parseFloat(insumoPostCompra[0].stock);
         assert(stockPostCompra === Number((stockAntesCompra + 20.50).toFixed(2)), `Stock aumentó de ${stockAntesCompra} a ${stockPostCompra} (+20.50 kg)`);
 
+        // Test GET /precio (listado global de precios vigentes)
+        const resPrecios = await fetch(`${BASE_URL}/precio`, {
+            headers: { Authorization: `Bearer ${tokenAdmin}` }
+        });
+        const listaPrecios = await resPrecios.json();
+        assert(resPrecios.status === 200 && Array.isArray(listaPrecios), `Listado general de precios (/precio) responde 200 OK (Total: ${listaPrecios.length})`);
+
+        // Test GET /precio/:insumo_id (historial de precios por insumo)
+        const resHistorialInsumo = await fetch(`${BASE_URL}/precio/${testInsumo.id}`, {
+            headers: { Authorization: `Bearer ${tokenAdmin}` }
+        });
+        const historialInsumo = await resHistorialInsumo.json();
+        assert(resHistorialInsumo.status === 200 && Array.isArray(historialInsumo) && historialInsumo.length >= 1, `Historial de precios de insumo (/precio/${testInsumo.id}) responde 200 OK con registros`);
+
         // ----------------------------------------------------
         // TEST 5: PRODUCCIÓN (DESCUENTO AUTOMÁTICO, ALERTAS Y REVERSIONES)
         // ----------------------------------------------------

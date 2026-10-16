@@ -40,8 +40,11 @@ export const obtenerPrecios = async (req, res) => {
         const resultado = await getPrecios();
         return res.json(resultado);
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({error: "Error al obtener todos los precios"});
+        console.error("Error al obtener todos los precios:", error);
+        return res.status(500).json({
+            error: "Error al obtener todos los precios",
+            details: error.sqlMessage || error.message
+        });
     }
 }
 

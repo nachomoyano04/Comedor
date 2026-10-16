@@ -15,12 +15,15 @@ export const insertPrecio = async (precio, connection) => {
 //READ
 export const getPrecios = async () => {
     const query = `SELECT i.id, i.codigo, i.producto, udm.nombre AS unidad_de_medida, p.precio_unitario, p.fecha_desde, pr.razon_social
-                    FROM insumo AS i
-                    JOIN unidad_de_medida AS udm ON udm.id = i.id_unidad_de_medida
-                    JOIN precio AS p ON i.id = p.insumo_id AND p.fecha_desde = (SELECT MAX(p2.fecha_desde)
-                            FROM precio AS p2
-                            WHERE p2.insumo_id = i.id)
-                    JOIN proveedor AS pr ON pr.id = p.proveedor_id
+                    FROM precio AS p
+                    JOIN (
+                        SELECT insumo_id, MAX(id) AS max_id
+                        FROM precio
+                        GROUP BY insumo_id
+                    ) AS latest ON p.id = latest.max_id
+                    JOIN insumo AS i ON i.id = p.insumo_id
+                    LEFT JOIN unidad_de_medida AS udm ON udm.id = i.id_unidad_de_medida
+                    LEFT JOIN proveedor AS pr ON pr.id = p.proveedor_id
                     ORDER BY p.fecha_desde DESC`;
     try {
         const resultado = await pool.query(query);
