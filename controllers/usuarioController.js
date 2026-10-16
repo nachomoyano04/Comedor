@@ -243,6 +243,9 @@ export const renovar_token = async (req, res) => {
         if (usuario.length == 0) {
             return res.status(401).json({ error: "Usuario no encontrado" });
         }
+        if (usuario[0].estado == 0) {
+            return res.status(403).json({ error: "Su cuenta está desactivada, comunicarse con el Administrador" });
+        }
 
         const nuevo_access_token = generateAccessToken(usuario);
         return res.json({ access_token: nuevo_access_token });
