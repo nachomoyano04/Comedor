@@ -14,33 +14,76 @@ import cookieParser from "cookie-parser";
 
 dotenv.config();
 
+// Validación preventiva de configuración de entorno (Fail-fast en producción)
+const validateEnvironment = () => {
+    const isProduction = process.env.NODE_ENV === "production";
+    const requiredVars = ["DB_HOST", "DB_USER", "DB_DATABASE"];
+    const missing = requiredVars.filter(v => !process.env[v]);
+    
+    if (missing.length > 0) {
+        console.error(`[CRÍTICO] Faltan variables de entorno esenciales: ${missing.join(", ")}`);
+        if (isProduction) process.exit(1);
+    }
+
+    if (isProduction) {
+        if (!process.env.DB_PASSWORD) {
+            console.error("[CRÍTICO] DB_PASSWORD es obligatoria en entorno de producción.");
+            process.exit(1);
+        }
+        if (!process.env.ACCESS_TOKEN_SECRET || process.env.ACCESS_TOKEN_SECRET.length < 32 || process.env.ACCESS_TOKEN_SECRET.includes("insecure") || process.env.ACCESS_TOKEN_SECRET.includes("cambiar")) {
+            console.error("[CRÍTICO] ACCESS_TOKEN_SECRET no está configurado o es inseguro para producción.");
+            process.exit(1);
+        }
+        if (!process.env.REFRESH_TOKEN_SECRET || process.env.REFRESH_TOKEN_SECRET.length < 32 || process.env.REFRESH_TOKEN_SECRET.includes("insecure") || process.env.REFRESH_TOKEN_SECRET.includes("cambiar")) {
+            console.error("[CRÍTICO] REFRESH_TOKEN_SECRET no está configurado o es inseguro para producción.");
+            process.exit(1);
+        }
+        if (!process.env.CORS_ORIGIN || process.env.CORS_ORIGIN.includes("localhost")) {
+            console.warn("[ADVERTENCIA PRODUCCIÓN] CORS_ORIGIN no está definido o incluye dominios locales (localhost).");
+        }
+    }
+};
+validateEnvironment();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.set("trust proxy", 1);
+app.disable("x-powered-by");
 
-//CORS
-const allowedOrigins = process.env.CORS_ORIGIN 
-    ? process.env.CORS_ORIGIN.split(",").map(o => o.trim()) 
-    : ["http://localhost:5173"];
+// Cabeceras básicas de seguridad HTTP (DevSecOps Hardening)
+app.use((req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    if (process.env.NODE_ENV === "production") {
+        res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    }
+    next();
+});
+
+// CORS Seguro
+const defaultOrigins = ["http://localhost:5173", "http://127.0.0.1:5173"];
+const envOrigins = process.env.CORS_ORIGIN 
+    ? process.env.CORS_ORIGIN.split(",").map(o => o.trim()).filter(Boolean) 
+    : [];
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...envOrigins]));
 
 const corsOptions = {
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
+        // Permitir llamadas sin origin (herramientas locales, server-to-server o mismo origen)
+        if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(null, true); // Allow all configured origins in production
+            callback(new Error(`Origen no permitido por la política CORS: ${origin}`));
         }
     },
-    credentials: true
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 };
 
 app.use(cors(corsOptions));
-
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Credentials", "true");
-    next();
-});
 
 //JSON parser
 app.use(express.json());

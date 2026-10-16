@@ -13,7 +13,7 @@ export const insertUsuario = async (usuario, connection) => {
 
 //READ
 export const getUsuarios = async () => {
-    const query = "SELECT * FROM usuario";
+    const query = "SELECT id, nombre, apellido, dni, cuil, telefono, correo, estado FROM usuario";
     try{
         const resultado = await pool.query(query);
         return resultado[0];
@@ -43,7 +43,7 @@ export const getPassUserById = async id => {
 }
 
 export const getUsuariosByRol = async (rol_id) => {
-    const query = "SELECT u.* FROM usuario_rol AS ur JOIN usuario AS u ON u.id = ur.usuario_id WHERE ur.rol_id = ?";
+    const query = "SELECT u.id, u.nombre, u.apellido, u.dni, u.cuil, u.telefono, u.correo, u.estado FROM usuario_rol AS ur JOIN usuario AS u ON u.id = ur.usuario_id WHERE ur.rol_id = ?";
     try{
         const resultado = await pool.query(query, [rol_id]);
         return resultado[0];

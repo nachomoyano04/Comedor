@@ -2,8 +2,21 @@ import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { findUsuarioByDNI, getPasswordByDNI, insertUsuario } from "../models/usuario.js";
 
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "redacted_placeholder_secret";
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "redacted_placeholder_secret";
+const getAccessTokenSecret = () => {
+    const secret = process.env.ACCESS_TOKEN_SECRET;
+    if (!secret) {
+        throw new Error("ACCESS_TOKEN_SECRET no está configurado en las variables de entorno (.env).");
+    }
+    return secret;
+};
+
+const getRefreshTokenSecret = () => {
+    const secret = process.env.REFRESH_TOKEN_SECRET;
+    if (!secret) {
+        throw new Error("REFRESH_TOKEN_SECRET no está configurado en las variables de entorno (.env).");
+    }
+    return secret;
+};
 
 //Hasheo de password
 export const hashearPassword = async pass => {
@@ -16,7 +29,8 @@ export const hashearPassword = async pass => {
         });
         return hash;
     } catch (error) {
-        console.error(error);
+        console.error("Error al hashear contraseña:", error);
+        throw error;
     }
 }
 
@@ -25,12 +39,12 @@ export const verificarPassword = async (hash, pass) => {
     try {
         return await argon2.verify(hash, pass);
     } catch (error) {
-        console.error(error);
+        console.error("Error al verificar contraseña:", error);
         return false;
     }
 };
 
-//Generar token
+//Generar token de acceso
 export const generateAccessToken = usuario => {
     const roles = usuario.map(u => u.numero_rol);
     return jwt.sign({
@@ -39,7 +53,7 @@ export const generateAccessToken = usuario => {
         apellido: usuario[0].apellido,
         dni: usuario[0].dni,
         roles
-    }, ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
+    }, getAccessTokenSecret(), { algorithm: "HS256", expiresIn: '24h' });
 };
 
 //Renovamos token
@@ -51,13 +65,13 @@ export const refreshAccessToken = usuario => {
         apellido: usuario[0].apellido,
         dni: usuario[0].dni,
         roles
-    }, REFRESH_TOKEN_SECRET, { expiresIn: '30d' });
+    }, getRefreshTokenSecret(), { algorithm: "HS256", expiresIn: '30d' });
 };
 
 //Verificar refresh_token
 export const validateRefreshToken = token => {
     try {
-        return jwt.verify(token, REFRESH_TOKEN_SECRET);
+        return jwt.verify(token, getRefreshTokenSecret(), { algorithms: ["HS256"] });
     } catch (error) {
         return null;
     }

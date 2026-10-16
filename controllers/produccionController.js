@@ -45,13 +45,14 @@ export const nuevaProduccion = async (req, res) => {
         await updateCostoPrimoTotalProduccion(costo_primo_total, produccion_id, connection);
         await connection.commit();
         return res.json({
+            id: produccion_id,
             mensaje: "Producción registrada correctamente.",
             alertas: alertasStock
         });
     }catch(error){
         await connection.rollback();
-        console.log(error);
-        return res.status(500).json({error: "Error al registrar nueva producción: " + (error.sqlMessage || error.message)});
+        console.error("Error al registrar nueva producción:", error);
+        return res.status(500).json({ error: "Error al registrar nueva producción" });
     }finally{
         connection.release();
     }

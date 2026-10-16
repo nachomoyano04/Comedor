@@ -28,8 +28,8 @@ export const crearPrecio = async (req, res) => {
         return res.status(500).json({error: "No se pudo registrar el precio."});
     }catch(error){
         await connection.rollback();
-        console.log(error); 
-        return res.status(500).json({error: "Error al crear precio: " + (error.sqlMessage || error.message)});
+        console.error("Error al crear precio:", error); 
+        return res.status(500).json({ error: "Error al crear precio" });
     }finally{
         connection.release();
     }

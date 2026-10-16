@@ -1,2 +1,33 @@
+# Dependencies
 node_modules/
+
+# Environment files and credentials
 .env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.sw?
+*.bak
+*.tmp
+
+# Sensitive database dumps with personal data (PII)
+database/comedor.sql
+database/*.dump
+database/*.backup
+
+# Local testing credentials
+.test-credentials.local*
+TEST_CREDENTIALS.local*

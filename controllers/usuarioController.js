@@ -144,6 +144,13 @@ export const obtenerUsuariosPorRol = async (req, res) => {
 
 export const buscarUsuarioPorDni = async (req, res) => {
     const { dni } = req.params;
+    const esUnoMismo = String(req.user?.dni) === String(dni);
+    const esAdmin = req.user?.roles?.includes(ROLES.ADMIN);
+
+    if (!esUnoMismo && !esAdmin) {
+        return res.status(403).json({ error: "No tiene permisos para consultar este usuario" });
+    }
+
     try {
         const resultado = await findUsuarioByDNI(dni);
         return res.json(resultado);
@@ -199,12 +206,17 @@ export const loginUsuario = async (req, res) => {
             return res.status(401).json(tokens.error);
         }
         const { access_token, refresh_token, nombre } = tokens;
-        //Guardamos el token para las peticiones 401 en una cookie segura en el backend...
-        const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.PORT && process.env.PORT !== "6970");
+        // Configuración de cookie para refresh token (configurable por entorno)
+        const isProduction = process.env.NODE_ENV === "production";
+        const cookieSecure = process.env.COOKIE_SECURE !== undefined 
+            ? process.env.COOKIE_SECURE === "true" 
+            : isProduction;
+        const cookieSameSite = process.env.COOKIE_SAMESITE || (cookieSecure ? "none" : "lax");
+
         res.cookie("refresh_token", refresh_token, {
             httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? "none" : "lax",
+            secure: cookieSecure,
+            sameSite: cookieSameSite,
             path: "/",
             maxAge: 30 * 24 * 60 * 60 * 1000 // 30 días
         });
@@ -241,11 +253,16 @@ export const renovar_token = async (req, res) => {
 }
 
 export const eliminar_token_refresh = (req, res) => {
-    const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.PORT && process.env.PORT !== "6970");
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieSecure = process.env.COOKIE_SECURE !== undefined 
+        ? process.env.COOKIE_SECURE === "true" 
+        : isProduction;
+    const cookieSameSite = process.env.COOKIE_SAMESITE || (cookieSecure ? "none" : "lax");
+
     res.clearCookie("refresh_token", {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
+        secure: cookieSecure,
+        sameSite: cookieSameSite,
         path: "/"
     });
     res.sendStatus(204);

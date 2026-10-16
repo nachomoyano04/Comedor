@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "node test_suite.js",
+    "test:security": "node test_security.js",
+    "test:all": "node test_suite.js && node test_security.js",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },

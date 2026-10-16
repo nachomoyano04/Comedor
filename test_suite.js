@@ -26,13 +26,16 @@ async function runTestSuite() {
     let tokenAdmin = "";
     let tokenDirectivo = "";
 
+    const createdInsumoIds = new Set();
+    const createdProduccionIds = new Set();
+
     try {
         // ----------------------------------------------------
         // TEST 1: AUTENTICACIÓN Y GENERACIÓN DE TOKENS
         // ----------------------------------------------------
         console.log("👉 1. Pruebas de Autenticación y Roles...");
         const loginOk = await login("44480378", "44480378");
-        assert(loginOk.access_token && loginOk.nombre === "Ignacio", "Login exitoso con DNI 44480378");
+        assert(loginOk.access_token && Boolean(loginOk.nombre), `Login exitoso con DNI 44480378 (Usuario: ${loginOk.nombre})`);
         tokenAdmin = loginOk.access_token;
 
         const loginFail = await login("44480378", "clave_falsa");
@@ -70,13 +73,15 @@ async function runTestSuite() {
                 stock: 50.00
             })
         });
-        const msgCrearInsumo = await resCrearInsumo.json();
         assert(resCrearInsumo.status === 200, "Creación de nuevo insumo");
 
         // Buscar el insumo creado
         const [rowsInsumo] = await pool.query("SELECT * FROM insumo WHERE codigo = ?", [codigoPrueba]);
         const testInsumo = rowsInsumo[0];
         assert(testInsumo && parseFloat(testInsumo.stock) === 50.00, "Insumo guardado en MySQL con stock decimal 50.00");
+        if (testInsumo?.id) {
+            createdInsumoIds.add(testInsumo.id);
+        }
 
         // ----------------------------------------------------
         // TEST 3: GESTIÓN DE PROVEEDORES
@@ -131,15 +136,18 @@ async function runTestSuite() {
         });
         const dataProd = await resProd.json();
         assert(resProd.status === 200 && dataProd.mensaje, "Registro de producción con descuento de stock");
+        const produccionId = dataProd.id;
+        if (produccionId) {
+            createdProduccionIds.add(produccionId);
+        }
 
         const [insumoPostProd] = await pool.query("SELECT stock FROM insumo WHERE id = ?", [testInsumo.id]);
         const stockPostProd = parseFloat(insumoPostProd[0].stock);
         assert(stockPostProd === Number((stockPostCompra - 15.00).toFixed(2)), `Descuento automático verificado: Stock cayó a ${stockPostProd} (-15.00 kg)`);
 
-        // Obtener el ID de la producción recién creada
-        const [lastProd] = await pool.query("SELECT id, costo_primo_total FROM produccion ORDER BY id DESC LIMIT 1");
-        const produccionId = lastProd[0].id;
-        assert(parseFloat(lastProd[0].costo_primo_total) > 0, `Cálculo automático de Costo Primo Total: $${lastProd[0].costo_primo_total}`);
+        // Verificar el cálculo del Costo Primo Total
+        const [lastProd] = await pool.query("SELECT id, costo_primo_total FROM produccion WHERE id = ?", [produccionId]);
+        assert(lastProd.length > 0 && parseFloat(lastProd[0].costo_primo_total) > 0, `Cálculo automático de Costo Primo Total: $${lastProd[0]?.costo_primo_total}`);
 
         // Dar de baja la producción -> Debe reintegrar los 15 kg al stock
         const resBaja = await fetch(`${BASE_URL}/produccion/${produccionId}/estado/1`, {
@@ -179,6 +187,9 @@ async function runTestSuite() {
         });
         const dataSobreconsumo = await resSobreconsumo.json();
         assert(dataSobreconsumo.alertas && dataSobreconsumo.alertas.length > 0, `Generación exitosa de alerta de stock negativo: ${dataSobreconsumo.alertas[0]}`);
+        if (dataSobreconsumo.id) {
+            createdProduccionIds.add(dataSobreconsumo.id);
+        }
 
         // ----------------------------------------------------
         // TEST 6: CONTROL BROMATOLÓGICO Y ROTACIÓN FIFO
@@ -219,20 +230,32 @@ async function runTestSuite() {
         });
         assert(resPostDirectivo.status === 403, "Rol DIRECTIVOS tiene bloqueada la creación de producciones (403 Forbidden)");
 
-        // ----------------------------------------------------
-        // LIMPIEZA DE DATOS TEMPORALES
-        // ----------------------------------------------------
-        console.log("\n👉 8. Limpieza de datos de prueba...");
-        const sobreconsumoId = dataSobreconsumo?.id || 0;
-        await pool.query("DELETE FROM produccion_insumo WHERE insumo_id = ? OR produccion_id IN (?, ?)", [testInsumo.id, produccionId, sobreconsumoId]);
-        await pool.query("DELETE FROM produccion WHERE id IN (?, ?)", [produccionId, sobreconsumoId]);
-        await pool.query("DELETE FROM precio WHERE insumo_id = ?", [testInsumo.id]);
-        await pool.query("DELETE FROM insumo WHERE id = ?", [testInsumo.id]);
-        console.log("  🧹 Insumos y producciones de prueba eliminados correctamente.");
-
     } catch (err) {
         console.error("Error durante las pruebas:", err);
         testsFailed++;
+    } finally {
+        // ----------------------------------------------------
+        // LIMPIEZA ROBUSTA Y GARANTIZADA DE REGISTROS DE PRUEBA
+        // ----------------------------------------------------
+        console.log("\n👉 Limpieza garantizada de datos de prueba...");
+        try {
+            const prodIds = Array.from(createdProduccionIds);
+            const insumoIds = Array.from(createdInsumoIds);
+
+            if (prodIds.length > 0) {
+                await pool.query("DELETE FROM produccion_insumo WHERE produccion_id IN (?)", [prodIds]);
+                await pool.query("DELETE FROM produccion WHERE id IN (?)", [prodIds]);
+            }
+            if (insumoIds.length > 0) {
+                await pool.query("DELETE FROM produccion_insumo WHERE insumo_id IN (?)", [insumoIds]);
+                await pool.query("DELETE FROM precio WHERE insumo_id IN (?)", [insumoIds]);
+                await pool.query("DELETE FROM receta_insumo WHERE insumo_id IN (?)", [insumoIds]);
+                await pool.query("DELETE FROM insumo WHERE id IN (?)", [insumoIds]);
+            }
+            console.log(`  🧹 Limpieza completada: ${prodIds.length} producciones y ${insumoIds.length} insumos de prueba purgados.`);
+        } catch (cleanupErr) {
+            console.error("  ⚠️ Error durante la limpieza de datos de prueba:", cleanupErr);
+        }
     }
 
     console.log("\n==========================================================");

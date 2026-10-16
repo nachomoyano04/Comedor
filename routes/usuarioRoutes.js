@@ -15,10 +15,10 @@ router.use(authMiddleware); //Middleware de autenticacion con jwt
 router.patch("/pass/:id", cambiarPassword);
 router.put("/:id", editarUsuario);
 router.get("/dni/:dni", buscarUsuarioPorDni);
-router.get("/rol/:rol_id", obtenerUsuariosPorRol);
 
 router.use(roleMiddleware([ROLES.ADMIN]));
 
+router.get("/rol/:rol_id", obtenerUsuariosPorRol);
 router.get("/", obtenerUsuarios);
 router.post("/", nuevoUsuario);
 router.patch("/del/:id", borrarUsuario);

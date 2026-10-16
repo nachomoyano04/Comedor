@@ -15,8 +15,8 @@ export const nuevoProveedor = async (req, res) => {
         }
         return res.json("No se pudo registrar el proveedor.");
     }catch(error){
-        console.log(error);
-        return res.status(500).json({error: "Error al registrar nuevo proveedor", message: error.sqlMessage});
+        console.error("Error al registrar nuevo proveedor:", error);
+        return res.status(500).json({error: "Error al registrar nuevo proveedor"});
     }
 } 
 
@@ -35,8 +35,8 @@ export const editarProveedor = async (req, res) => {
         }
         return res.json("No se pudo editar el proveedor");
     }catch(error){
-        console.log(error);
-        return res.status(500).json({error: "Error al actualizar proveedor", message: error.sqlMessage});
+        console.error("Error al actualizar proveedor:", error);
+        return res.status(500).json({error: "Error al actualizar proveedor"});
     }
 } 
 
@@ -45,8 +45,8 @@ export const obtenerProveedores = async (req, res) => {
         const resultado = await getProveedores();
         return res.json(resultado);
     }catch(error){
-        console.log(error);
-        return res.status(500).json({error: "Error al obtener proveedores", message: error.sqlMessage});
+        console.error("Error al obtener proveedores:", error);
+        return res.status(500).json({error: "Error al obtener proveedores"});
     }
 }
 
@@ -56,8 +56,8 @@ export const obtenerProveedor = async (req, res) => {
         const resultado = await getProveedor(id);
         return res.json(resultado);
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({error: "Error al obtener proveedor", message: error.sqlMessage});
+        console.error("Error al obtener proveedor:", error);
+        return res.status(500).json({error: "Error al obtener proveedor"});
     }
 }
 
@@ -70,8 +70,8 @@ export const borrarProveedor = async (req, res) => {
         }
         return res.json("No se pudo dar de baja el proveedor.");
     }catch(error){
-        console.log(error);
-        return res.status(500).json({error: "Error al dar de baja al proveedor", message: error.sqlMessage});
+        console.error("Error al dar de baja al proveedor:", error);
+        return res.status(500).json({error: "Error al dar de baja al proveedor"});
     }
 } 
 
@@ -84,8 +84,8 @@ export const activarProveedor = async (req, res) => {
         }
         return res.json("No se pudo activar el proveedor.");
     }catch(error){
-        console.log(error);
-        return res.status(500).json({error: "Error al activar el proveedor", message: error.sqlMessage});
+        console.error("Error al activar el proveedor:", error);
+        return res.status(500).json({error: "Error al activar el proveedor"});
     }
 } 
 
@@ -95,8 +95,8 @@ export const nuevoContactoProveedor = async (req, res) => {
         const resultado = await insertContactoProveedor(contacto_proveedor);
         return res.json({id_contacto: resultado});
     }catch(error){
-        console.log(error);
-        return res.status(500).json({error: "Error al agregar nuevo contacto de proveedor", message: error.sqlMessage});       
+        console.error("Error al agregar nuevo contacto de proveedor:", error);
+        return res.status(500).json({error: "Error al agregar nuevo contacto de proveedor"});       
     }
 }
 
@@ -110,8 +110,8 @@ export const editarContactoProveedor = async (req, res) => {
         }
         return res.json("No se pudo editar el contacto del proveedor.");
     }catch(error){
-        console.log(error);
-        return res.status(500).json({error: "Error al editar contacto de proveedor", message: error.sqlMessage});       
+        console.error("Error al editar contacto de proveedor:", error);
+        return res.status(500).json({error: "Error al editar contacto de proveedor"});       
     }
 }
 
@@ -121,8 +121,8 @@ export const obtenerContactosPorProveedor = async (req, res) => {
         const resultado = await getConProvByIdProveedor(id);
         return res.json(resultado);
     }catch(error){
-        console.log(error);
-        return res.status(500).json({error: "Error al obtener contactos del proveedor", message: error.sqlMessage});       
+        console.error("Error al obtener contactos del proveedor:", error);
+        return res.status(500).json({error: "Error al obtener contactos del proveedor"});       
     }
 }
 
@@ -135,7 +135,7 @@ export const borrarContactoProveedor = async (req, res) => {
         }
         return res.json("No se pudo borrar el contacto del proveedor.");
     }catch(error){
-        console.log(error);
-        return res.status(500).json({error: "Error al borrar contacto del proveedor", message: error.sqlMessage});       
+        console.error("Error al borrar contacto del proveedor:", error);
+        return res.status(500).json({error: "Error al borrar contacto del proveedor"});       
     }
 }

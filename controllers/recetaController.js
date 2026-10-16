@@ -48,8 +48,8 @@ export const nuevaReceta = async (req, res) => {
     return res.json("Receta registrada con éxito.");
   } catch (error) {
     await connection.rollback();
-    console.log(error);
-    return res.status(500).json({ error: "Error al registrar nueva receta: " + (error.sqlMessage || error.message) });
+    console.error("Error al registrar nueva receta:", error);
+    return res.status(500).json({ error: "Error al registrar nueva receta" });
   } finally {
     connection.release();
   }
@@ -101,8 +101,8 @@ export const editarReceta = async (req, res) => {
     return res.json("Receta editada.");
   } catch (error) {
     await connection.rollback();
-    console.log(error);
-    return res.status(500).json({ error: "Error al editar receta: " + (error.sqlMessage || error.message) });
+    console.error("Error al editar receta:", error);
+    return res.status(500).json({ error: "Error al editar receta" });
   } finally {
     connection.release();
   }
