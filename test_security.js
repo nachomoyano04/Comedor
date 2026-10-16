@@ -248,6 +248,50 @@ async function runSecurityTestSuite() {
         });
         assert(resRefreshExpired.status === 401, "Renovación con refresh token vencido rechazada con 401");
 
+        // 5.4 Petición de renovación legítima con usuario activo
+        const refreshActivo = jwt.sign({
+            id: 1,
+            dni: "44480378",
+            roles: [1]
+        }, refreshSecret, { algorithm: "HS256", expiresIn: "30d" });
+        const resRefreshActivo = await fetch(`${BASE_URL}/usuario/auth/refresh`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh_token: refreshActivo })
+        });
+        const dataRefreshActivo = await resRefreshActivo.json();
+        assert(
+            resRefreshActivo.status === 200 && dataRefreshActivo.access_token,
+            "Usuario activo puede renovar normalmente su token (200 OK con access_token)"
+        );
+
+        // 5.5 Petición de renovación rechazada para usuario desactivado (estado = 0)
+        const dniInactivo = "99999998";
+        await pool.query(
+            "INSERT INTO usuario (nombre, apellido, dni, cuil, telefono, correo, password, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            ["Inactivo", "Test", dniInactivo, "20-99999998-9", "555-9998", "inactivo@example.com", "hash", 0]
+        );
+        try {
+            const refreshInactivo = jwt.sign({
+                id: 999,
+                dni: dniInactivo,
+                roles: [2]
+            }, refreshSecret, { algorithm: "HS256", expiresIn: "30d" });
+
+            const resRefreshInactivo = await fetch(`${BASE_URL}/usuario/auth/refresh`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ refresh_token: refreshInactivo })
+            });
+            const dataRefreshInactivo = await resRefreshInactivo.json();
+            assert(
+                resRefreshInactivo.status === 403 && dataRefreshInactivo.error?.includes("desactivada"),
+                "Usuario desactivado rechazado al intentar renovar token (403 Forbidden)"
+            );
+        } finally {
+            await pool.query("DELETE FROM usuario WHERE dni = ?", [dniInactivo]);
+        }
+
         // ----------------------------------------------------
         // SECCIÓN 6: PROTECCIÓN DE CAMPOS SENSIBLES Y POLÍTICAS HTTP
         // ----------------------------------------------------
