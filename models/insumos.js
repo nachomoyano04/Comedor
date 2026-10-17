@@ -12,7 +12,7 @@ export const getInsumos = async () => {
 
 export const getInsumosParaReceta = async () => {
     try{
-       const insumos = await pool.query("SELECT i.id, i.producto, udm.simbolo, i.estado FROM insumo AS i JOIN unidad_de_medida AS udm ON i.id_unidad_de_medida = udm.id;");
+       const insumos = await pool.query("SELECT i.id, i.producto, udm.simbolo, i.stock, i.estado FROM insumo AS i JOIN unidad_de_medida AS udm ON i.id_unidad_de_medida = udm.id;");
        return insumos[0]; 
     }catch(error) {
         throw error;
