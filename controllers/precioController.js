@@ -1,6 +1,6 @@
 import pool from "../config/database.js";
 import { getInsumo, updateStockInsumo } from "../models/insumos.js";
-import { deletePrecio, getPrecioById, getPrecioByInsumo, getPrecios, insertPrecio, makeFechaNull, updateFechaHasta, getAlertasVencimientos, getSugerenciasFIFO } from "../models/precio.js";
+import { deletePrecio, getPrecioById, getPrecioByInsumo, getPrecios, getTodasLasCompras, insertPrecio, makeFechaNull, updateFechaHasta, getAlertasVencimientos, getSugerenciasFIFO } from "../models/precio.js";
 
 export const crearPrecio = async (req, res) => {
     const precio = { ...req.body };
@@ -43,6 +43,19 @@ export const obtenerPrecios = async (req, res) => {
         console.error("Error al obtener todos los precios:", error);
         return res.status(500).json({
             error: "Error al obtener todos los precios",
+            details: error.sqlMessage || error.message
+        });
+    }
+}
+
+export const obtenerTodasLasCompras = async (req, res) => {
+    try {
+        const resultado = await getTodasLasCompras();
+        return res.json(resultado);
+    } catch (error) {
+        console.error("Error al obtener todas las compras:", error);
+        return res.status(500).json({
+            error: "Error al obtener todas las compras",
             details: error.sqlMessage || error.message
         });
     }

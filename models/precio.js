@@ -33,6 +33,24 @@ export const getPrecios = async () => {
     }
 }
 
+export const getTodasLasCompras = async (connection) => {
+    const conn = connection || pool;
+    const query = `SELECT p.id, p.insumo_id, p.proveedor_id, p.precio_unitario, 
+                          p.fecha_desde, p.fecha_hasta, p.fecha_vencimiento, p.cantidad, 
+                          i.producto, udm.simbolo, prov.razon_social
+                   FROM precio AS p
+                   JOIN insumo AS i ON p.insumo_id = i.id
+                   LEFT JOIN unidad_de_medida AS udm ON i.id_unidad_de_medida = udm.id
+                   LEFT JOIN proveedor AS prov ON p.proveedor_id = prov.id
+                   ORDER BY p.fecha_desde DESC, p.id DESC`;
+    try {
+        const resultado = await conn.query(query);
+        return resultado[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const getPrecioByInsumo = async (id, connection) => {
     const query = `SELECT p.id, p.insumo_id, p.proveedor_id, p.precio_unitario, p.fecha_desde, p.fecha_hasta, p.fecha_vencimiento, p.cantidad, i.producto, prov.razon_social
                     FROM precio AS p
